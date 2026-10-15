@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProgWeb 2 — Retomada Prática Frontend (Bootstrap 5 & jQuery)</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS & Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: #131b2e;
+      --border-color: rgba(255, 255, 255, 0.12);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #a855f7;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2.5rem 1rem;
+    }
+
+    .font-outfit {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .font-code {
+      font-family: 'Fira Code', monospace;
+    }
+
+    .hub-card {
+      background: rgba(19, 27, 46, 0.85);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2.2rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hub-card:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-action {
+      padding: 0.85rem 1.6rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .btn-action-p1 {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: white;
+    }
+
+    .btn-action-p1:hover {
+      background: linear-gradient(135deg, #0369a1, #0284c7);
+      color: white;
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-action-p2 {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+    }
+
+    .btn-action-p2:hover {
+      background: linear-gradient(135deg, #047857, #059669);
+      color: white;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container" style="max-width: 1100px;">
+
+    <!-- CABEÇALHO PORTAL -->
+    <div class="text-center mb-5">
+      <span class="badge bg-primary bg-opacity-20 text-info border border-info border-opacity-25 px-3 py-2 rounded-pill font-code fs-6 mb-3">
+        <i class="bi bi-code-slash me-1"></i> Programação para a Internet 2 • CST Sistemas para a Internet
+      </span>
+      <h1 class="display-5 font-outfit text-white fw-bold mb-3">
+        Portal de Retomada Frontend:<br>
+        <span class="text-info">Bootstrap 5 & jQuery</span>
+      </h1>
+      <p class="lead text-secondary mx-auto" style="max-width: 800px; font-size: 1.15rem;">
+        Selecione abaixo o tópico desejado para acessar os slides interativos e os guias práticos de código:
+      </p>
+    </div>
+
+    <!-- CARDS DE NAVEGAÇÃO SIGAA -->
+    <div class="row g-4 justify-content-center">
+
+      <!-- CARD PARTE 1: BOOTSTRAP 5 -->
+      <div class="col-md-6">
+        <div class="hub-card" style="border-top: 4px solid var(--accent-blue);">
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="p-3 bg-info bg-opacity-20 text-info rounded-3 fs-2">
+                <i class="bi bi-bootstrap-fill"></i>
+              </div>
+              <span class="badge bg-info text-dark font-code fw-bold fs-6">TÓPICO 1 • PARTE 1</span>
+            </div>
+
+            <h2 class="h4 font-outfit text-white fw-bold mb-2">Parte 1 — Bootstrap 5: Layout & Design Estático</h2>
+            <p class="text-secondary small mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+              Estruturação da interface web responsiva utilizando o sistema de Grid de 12 colunas, formulários estilizados, cartões, badges e tabelas zebradas.
+            </p>
+
+            <ul class="text-secondary small ps-3 mb-4 font-code" style="font-size: 0.88rem; line-height: 1.7;">
+              <li><i class="bi bi-check2-circle text-info me-1"></i> Grid 12 Colunas & Containers</li>
+              <li><i class="bi bi-check2-circle text-info me-1"></i> Formulários & Inputs Estilizados</li>
+              <li><i class="bi bi-check2-circle text-info me-1"></i> Cards, Modais & Tabelas</li>
+              <li><i class="bi bi-check2-circle text-info me-1"></i> Layout Estático Completo (Exemplo 5)</li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="parte-1-bootstrap/index.html" class="btn-action btn-action-p1 font-outfit">
+              <i class="bi bi-journal-code me-1"></i> Acessar Slides da Parte 1 (Bootstrap 5) &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD PARTE 2: JQUERY -->
+      <div class="col-md-6">
+        <div class="hub-card" style="border-top: 4px solid var(--accent-emerald);">
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="p-3 bg-success bg-opacity-20 text-success rounded-3 fs-2">
+                <i class="bi bi-lightning-charge-fill"></i>
+              </div>
+              <span class="badge bg-success text-white font-code fw-bold fs-6">TÓPICO 2 • PARTE 2</span>
+            </div>
+
+            <h2 class="h4 font-outfit text-white fw-bold mb-2">Parte 2 — jQuery: Programação Dinâmica & LocalStorage</h2>
+            <p class="text-secondary small mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+              Adição de inteligência e interatividade no cliente: manipulação da árvore DOM, escutadores de eventos, animações visuais e salvamento local.
+            </p>
+
+            <ul class="text-secondary small ps-3 mb-4 font-code" style="font-size: 0.88rem; line-height: 1.7;">
+              <li><i class="bi bi-check2-circle text-success me-1"></i> Seletores $() & Eventos de Clique</li>
+              <li><i class="bi bi-check2-circle text-success me-1"></i> Efeitos Visuais (fadeIn, slideToggle)</li>
+              <li><i class="bi bi-check2-circle text-success me-1"></i> Manipulação do DOM (.append, .val)</li>
+              <li><i class="bi bi-check2-circle text-success me-1"></i> Persistência com LocalStorage</li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="parte-2-jquery/index.html" class="btn-action btn-action-p2 font-outfit">
+              <i class="bi bi-journal-code me-1"></i> Acessar Slides da Parte 2 (jQuery) &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <div class="text-center mt-5 text-muted small">
+      <p class="mb-0">
+        Prof. André Moraes • Instituto Federal de Santa Catarina (IFSC Câmpus Garopaba)
+      </p>
+    </div>
+
+  </div>
+
+</body>
+
+</html>

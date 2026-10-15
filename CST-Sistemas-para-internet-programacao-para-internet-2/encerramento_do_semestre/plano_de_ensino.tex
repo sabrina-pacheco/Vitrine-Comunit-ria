@@ -1,0 +1,342 @@
+\documentclass[12pt,a4paper]{article}
+
+% =====================================================
+% PACOTES E CONFIGURAÇÕES DE PÁGINA
+% =====================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil,shorthands=off]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[table]{xcolor}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{newtxtext,newtxmath}
+\usepackage[most]{tcolorbox}
+\usepackage{float}
+
+\geometry{
+    top=2.5cm,
+    bottom=2.5cm,
+    left=2.0cm,
+    right=2.0cm
+}
+
+\onehalfspacing
+
+% =====================================================
+% CORES INSTITUCIONAIS (IFSC)
+% =====================================================
+\definecolor{ifscGreen}{RGB}{22,163,74}
+\definecolor{azulTitulo}{RGB}{30,60,90}
+\definecolor{cinzaCabecalho}{RGB}{235,240,245}
+\definecolor{cinzaLinha}{RGB}{248,250,252}
+\definecolor{borderGray}{RGB}{200,210,220}
+
+% =====================================================
+% CONFIGURAÇÃO DE HIPERLINKS
+% =====================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=azulTitulo,
+    urlcolor=ifscGreen,
+    citecolor=azulTitulo
+}
+
+% =====================================================
+% ESTILOS DE SEÇÃO
+% =====================================================
+\titleformat{\section}
+{\normalfont\large\bfseries\color{azulTitulo}}
+{\thesection}
+{1em}
+{}
+[\vspace{0.2cm}\hrule\vspace{0.2cm}]
+
+\titleformat{\subsection}
+{\normalfont\bfseries\color{azulTitulo}}
+{\thesubsection}
+{1em}
+{}
+
+% =====================================================
+% CABEÇALHO E RODAPÉ
+% =====================================================
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{
+\includegraphics[height=1.3cm]{../figures/garopaba_horizontal_marca2015_PNG.png}
+}
+
+\fancyhead[R]{
+\textbf{Plano de Ensino — 2026/2}\\
+\small UC: Programação para a Internet 2 (ProgWeb 2)\\
+\small CST em Sistemas para a Internet — IFSC Garopaba
+}
+
+\fancyfoot[L]{\small\textit{Plano de Ensino — UC Programação para a Internet 2 (PPC CONSUP 30/2020)}}
+\fancyfoot[C]{}
+\fancyfoot[R]{\small Página \thepage}
+\renewcommand{\footrulewidth}{1.5pt}
+
+\setlength{\headheight}{45pt}
+
+% =====================================================
+% DOCUMENTO PRINCIPAL
+% =====================================================
+\begin{document}
+
+% -----------------------------------------------------
+% CABEÇALHO DE IDENTIFICAÇÃO INSTITUCIONAL
+% -----------------------------------------------------
+\begin{center}
+    \includegraphics[height=2.2cm]{../figures/garopaba_horizontal_marca2015_PNG.png}\\[0.4cm]
+    {\Large \textbf{MINISTÉRIO DA EDUCAÇÃO}}\\
+    {\large SECRETARIA DE EDUCAÇÃO PROFISSIONAL E TECNOLÓGICA}\\
+    {\large INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DE SANTA CATARINA}\\
+    {\large CÂMPUS GAROPABA}\\[0.4cm]
+    {\Large \textbf{PLANO DE ENSINO — UNIDADE CURRICULAR}}\\[0.2cm]
+    {\large \textbf{Semestre Letivo: 2026/2}}
+\end{center}
+
+\vspace{0.3cm}
+
+% -----------------------------------------------------
+% 1. DADOS DE IDENTIFICAÇÃO
+% -----------------------------------------------------
+\section{Dados de Identificação}
+
+\begin{table}[H]
+\centering
+\small
+\arrayrulecolor{borderGray}
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\rowcolor{cinzaCabecalho}
+\multicolumn{2}{|c|}{\textbf{INFORMAÇÕES DA UNIDADE CURRICULAR}} \\ \hline
+\textbf{Curso:} & Curso Superior de Tecnologia em Sistemas para a Internet (PPC 30/2020) \\ \hline
+\textbf{Unidade Curricular (UC):} & Programação para a Internet 2 (ProgWeb 2) / PIT II \\ \hline
+\textbf{Carga Horária Presencial:} & 60 horas (20 encontros semanais de 3h/aula em laboratório) \\ \hline
+\textbf{Carga Horária de Extensão:} & 40 horas (Atividades Curricularizadas de Extensão — PPC 30/2020) \\ \hline
+\textbf{Carga Horária Total da UC:} & 100 horas (60h Presenciais em Laboratório + 40h Extensão) \\ \hline
+\textbf{Carga Horária Semanal:} & 3 horas/aula semanais em laboratório de informática \\ \hline
+\textbf{Fase / Módulo:} & 4ª Fase (Matriz Curricular do PPC CONSUP 30/2020) \\ \hline
+\textbf{Pré-requisito(s):} & Programação para a Internet 1 (ProgWeb 1) \\ \hline
+\textbf{Docente Responsável:} & Prof. André Moraes (\texttt{chameoandre}) \\ \hline
+\textbf{E-mail do Docente:} & \url{andre.moraes@ifsc.edu.br} \\ \hline
+\end{tabularx}
+\end{table}
+
+% -----------------------------------------------------
+% 2. EMENTA (PPC DE SISTEMAS PARA A INTERNET)
+% -----------------------------------------------------
+\section{Ementa}
+
+Conceitos avançados de desenvolvimento frontend client-side; Inclusão e integração de bibliotecas e frameworks de interface (Bootstrap 5, jQuery); Arquitetura de código JavaScript modular utilizando ES6 Modules (\texttt{import}/\texttt{export}); Manipulação avançada do DOM e formulários reativos com validação visual no cliente; Programação assíncrona avançada com \texttt{Promises}, \texttt{async/await} e consumo de APIs RESTful via \texttt{Fetch API}; Conceitos e arquitetura de Single Page Applications (SPAs) com roteamento client-side sem recarregamento de página; Gerenciamento de Estado no Cliente e armazenamento persistente via Web Storage API (\texttt{localStorage} e \texttt{sessionStorage}); Introdução às ferramentas modernas de empacotamento, build e ecossistemas frontend (\texttt{Node.js}, \texttt{npm}, \texttt{Vite}); Versionamento, publicação e hospedagem de aplicações web profissionais com Git, GitHub e GitHub Pages; Desenvolvimento de Projeto Prático Integrador de Extensão.
+
+% -----------------------------------------------------
+% 3. OBJETIVOS
+% -----------------------------------------------------
+\section{Objetivos de Aprendizagem}
+
+\subsection{Objetivo Geral}
+Capacitar os estudantes na construção de aplicações web modernas, reativas, modulares e profissionais no lado do cliente (frontend), aptas a interagir assincronamente com serviços web RESTful e preparadas para os ecossistemas industriais de desenvolvimento web com aplicação de extensão comunitária.
+
+\subsection{Objetivos Específicos}
+\begin{itemize}[leftmargin=*]
+    \item Integrar componentes avançados de frameworks de UI (Bootstrap 5) e utilitários de manipulação do DOM (jQuery) em layouts responsivos completos;
+    \item Arquitetar projetos frontend modulares aplicando os padrões de ES6 Modules (\texttt{import}/\texttt{export}) e separação de responsabilidades;
+    \item Desenvolver rotinas assíncronas utilizando \texttt{async/await} para consumo e tratamento de exceções na integração com APIs RESTful via \texttt{Fetch API};
+    \item Implementar padrões de armazenamento local duradouro no navegador com a Web Storage API (\texttt{localStorage} e \texttt{sessionStorage});
+    \item Projetar arquiteturas de Single Page Applications (SPA) com gerenciamento de estado e navegação client-side;
+    \item Utilizar ferramentas de automação e ecossistemas web modernos (\texttt{Node.js}, \texttt{npm}, \texttt{Vite});
+    \item Desenvolver um projeto prático integrador de extensão resolvendo demandas reais da comunidade local ou acadêmica;
+    \item Versionar e publicar aplicações web utilizando Git, GitHub e a plataforma GitHub Pages.
+\end{itemize}
+
+% -----------------------------------------------------
+% 4. CONTEÚDO PROGRAMÁTICO E CRONOGRAMA SEMESTRAL
+% -----------------------------------------------------
+\section{Conteúdo Programático e Cronograma de Aulas (3h por Encontro)}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|c|X|c|}
+\hline
+\rowcolor{cinzaCabecalho}
+\textbf{Encontro} & \textbf{Conteúdo Programático e Atividades Práticas} & \textbf{CH (h)} \\ \hline
+\rowcolor{cinzaLinha}
+01 & \textbf{Módulo 1: Retomada \& Transição Parte 1 (Bootstrap 5)} — Transição ProgWeb 1 para ProgWeb 2, inclusão de CDN Bootstrap 5, Grid de 12 colunas, formulários estilizados, cards, badges e layout estático completo (Roteiro Prático 01 \& Apresentação Parte 1). & 3h \\ \hline
+02 & \textbf{Módulo 1: Retomada \& Transição Parte 2 (jQuery \& LocalStorage)} — Inclusão do jQuery, seletores avançados, eventos (\texttt{submit}, \texttt{click}), inserção dinâmica (.append()), animações visuais e salvamento local com LocalStorage (Roteiro Prático 02 \& Apresentação Parte 2). & 3h \\ \hline
+
+\rowcolor{cinzaLinha}
+03 & \textbf{Persistência Local no Navegador} — Armazenamento duradouro com Web Storage API (\texttt{localStorage}/\texttt{sessionStorage}), conversão JSON (\texttt{stringify}/\texttt{parse}). & 3h \\ \hline
+04 & \textbf{Formulários Reativos \& Validação Visual} — Validação de formulários no cliente, máscaras de entrada, feedbacks visuais de erro/sucesso e experiência do usuário (UX). & 3h \\ \hline
+\rowcolor{cinzaLinha}
+05 & \textbf{Módulo 2: Arquitetura Modular \& ES6 Modules} — Separação de responsabilidades em camadas, exportação e importação de módulos (\texttt{export}/\texttt{import}), escopo de arquivos. & 3h \\ \hline
+06 & \textbf{Padrões de Projeto no Client-Side} — Organização de serviços de dados (\textit{Services}), manipuladores de eventos (\textit{Handlers}) e renderizadores de UI (\textit{Views}). & 3h \\ \hline
+\rowcolor{cinzaLinha}
+07 & \textbf{Refatoração Modular Aplicada} — Transição de scripts monolíticos para arquitetura limpa em ES6 Modules com mentoria individual. & 3h \\ \hline
+08 & \textbf{Módulo 3: Assincronismo \& Consumo de APIs RESTful} — Conceito de requisições assíncronas, \texttt{Promises}, sintaxe \texttt{async/await} e tratamento com \texttt{try/catch}. & 3h \\ \hline
+\rowcolor{cinzaLinha}
+09 & \textbf{Integração com Fetch API} — Verbos HTTP (\texttt{GET}, \texttt{POST}, \texttt{PUT}, \texttt{DELETE}), manipulação de cabeçalhos (\texttt{Headers}) e payloads JSON. & 3h \\ \hline
+10 & \textbf{Tratamento Avançado de Erros e Feedbacks} — Estados de carregamento (\textit{spinners}), alertas de falha de conexão, tratamento de \textit{status codes} HTTP (404, 500). & 3h \\ \hline
+\rowcolor{cinzaLinha}
+11 & \textbf{Avaliação Teórica Única (A1)} — Avaliação teórica individual sobre arquitetura frontend, ES6 Modules, consumo assíncrono de APIs RESTful e protocolo HTTP. & 3h \\ \hline
+12 & \textbf{Módulo 4: Single Page Applications (SPAs)} — Arquitetura de aplicações de página única, roteamento client-side via JavaScript sem recarregamento da página. & 3h \\ \hline
+\rowcolor{cinzaLinha}
+13 & \textbf{Gerenciamento de Estado Global no Cliente} — Padrões de gestão de estado reativo, sincronização entre componentes e armazenamento em memória. & 3h \\ \hline
+14 & \textbf{Módulo 5: Ecossistemas Web Modernos} — Introdução ao \texttt{Node.js} e gerenciador de pacotes \texttt{npm}, inicialização de projetos e gestão de dependências. & 3h \\ \hline
+\rowcolor{cinzaLinha}
+15 & \textbf{Ferramentas de Build \& Bundlers (\texttt{Vite})} — Configuração do ambiente com \texttt{Vite}, compilação rápida, minificação de scripts e variáveis de ambiente (\texttt{.env}). & 3h \\ \hline
+16 & \textbf{Lançamento do Projeto Integrador de Extensão} — Definição do escopo com impacto social/comunitário, modelagem de dados, arquitetura e divisão das etapas do trabalho. & 3h \\ \hline
+\rowcolor{cinzaLinha}
+17 & \textbf{Desenvolvimento Guiado do Projeto Final (Extensão)} — Mentoria técnica em laboratório, integração do frontend modular com APIs backend e validação de requisitos. & 3h \\ \hline
+18 & \textbf{Mentoria Avançada \& Testes de Usabilidade} — Refatoração de código, testes de responsividade, acessibilidade e preparação para publicação no GitHub Pages. & 3h \\ \hline
+\rowcolor{cinzaLinha}
+19 & \textbf{Apresentação e Defesa do Projeto Integrador de Extensão (A3)} — Defesa oral e demonstrativa do projeto prático de extensão com participação comunitária/acadêmica. & 3h \\ \hline
+20 & \textbf{Encerramento do Semestre \& Recuperação Paralela} — Reavaliações finais, consolidação das notas e encerramento das atividades letivas. & 3h \\ \hline
+\multicolumn{2}{|r|}{\textbf{Carga Horária Total Presencial em Laboratório:}} & \textbf{60h} \\ \hline
+\end{tabularx}
+\end{table}
+
+% -----------------------------------------------------
+% 5. METODOLOGIA DE ENSINO
+% -----------------------------------------------------
+\section{Metodologia de Ensino e Aprendizagem}
+
+As aulas serão ministradas em \textbf{laboratório de informática em encontros semanais de 3h/aula}, adotando uma abordagem fortemente prática e centrada no estudante (\textit{Learning by Doing} e \textit{Project-Based Learning}):
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Estrutura Tripartida da Aula de 3h:} 1 hora inicial de exposição dialogada e demonstração ao vivo de código pelo docente (\textit{Live Coding}), seguida de 2 horas de prática intensiva orientada no laboratório;
+    \item \textbf{Roteiros Práticos Semanais:} Resolução de roteiros de laboratório com atividades orientadas passo a passo dispostas no repositório institucional do curso;
+    \item \textbf{Projeto Prático Integrador de Extensão:} Construção de uma aplicação web real de extensão comunitária/acadêmica integrando todos os tópicos ministrados no semestre;
+    \item \textbf{Versionamento \& Publicação Contínua:} Utilização do \texttt{Git}, \texttt{GitHub} e \texttt{GitHub Pages} como ambiente profissional de entrega dos trabalhos acadêmicos.
+\end{itemize}
+
+% -----------------------------------------------------
+% 6. CURRICULARIZAÇÃO DA EXTENSÃO UNIVERSITÁRIA (40 HORAS)
+% -----------------------------------------------------
+\section{Curricularização da Extensão Universitária (40 Horas)}
+
+Em cumprimento à \textbf{Meta 12.7 da Lei nº 13.005/2014 (PNE)}, à \textbf{Resolução CNE/CES nº 07/2018}, às \textbf{Resoluções CONSUP/IFSC nº 40/2016 e nº 61/2016} e à matriz curricular do \textbf{PPC do CST em Sistemas para a Internet (Resolução CONSUP nº 30/2020)}, a Unidade Curricular de Programação para a Internet 2 (PIT II) possui \textbf{40 horas destinadas a Atividades Curricularizadas de Extensão}.
+
+A ação extensionista tem como princípio a \textbf{interação dialógica e transformadora com a sociedade}, integrando os conhecimentos de desenvolvimento web frontend com as demandas da comunidade local de Garopaba e região ou da comunidade escolar.
+
+\subsection{Modalidades de Realização da Ação Extensionista}
+Para assegurar a exequibilidade e respeitar o ritmo de produção acadêmica das equipes, os estudantes poderão optar por uma das duas vias estruturadas:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Modalidade 1 — Ministração de Minicurso/Oficina Prática na SNCT (Semana Nacional de Ciência e Tecnologia):} \\
+    Proposição e condução de oficinas práticas de curta duração (2h a 4h) ministradas no laboratório de informática do Câmpus Garopaba durante a SNCT. O público-alvo prioritário compreende estudantes de escolas públicas da região e membros da comunidade iniciantes em tecnologia (ex: \textit{``Primeiros Passos na Criação de Páginas Web Interativas''}).
+    
+    \item \textbf{Modalidade 2 — Resumo Expandido de Experimento Prático de Produto Web (SNCT \& Computer on the Beach — COTB):} \\
+    Elaboração de um relato de experiência / resumo expandido (2 a 4 páginas) documentando o experimento prático e o desenvolvimento da aplicação web concebida dentro da própria disciplina (soluções voltadas a microempreendedores locais, preservação ambiental, turismo comunitário ou acessibilidade). O trabalho será submetido e apresentado na \textbf{Mostra Científico-Extensionista da SNCT} no Câmpus Garopaba e formatado para submissão no congresso científico \textbf{Computer on the Beach (COTB)}.
+\end{enumerate}
+
+\subsection{Detalhamento e Distribuição da Carga Horária de Extensão (40h)}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\rowcolor{cinzaCabecalho}
+\textbf{Etapa Extensionista} & \textbf{Atividades Previstas \& Entregáveis} & \textbf{CH (h)} \\ \hline
+\rowcolor{cinzaLinha}
+\textbf{Etapa 1: Diagnóstico \& Demanda} & Levantamento de requisitos e problemas reais com atores da comunidade externa, comerciantes ou estudantes de escolas públicas. & 10h \\ \hline
+\textbf{Etapa 2: Desenvolvimento Orientado} & Implementação da aplicação web no laboratório aplicando usabilidade, responsividade, acessibilidade e padrões modernos. & 20h \\ \hline
+\rowcolor{cinzaLinha}
+\textbf{Etapa 3: Apresentação \& Relato} & Demonstração na Mostra da SNCT (ou ministração da oficina) e redação do Resumo Expandido / Relatório de Extensão para o COTB. & 10h \\ \hline
+\multicolumn{2}{|r|}{\textbf{Carga Horária Total Curricularizada de Extensão:}} & \textbf{40h} \\ \hline
+\end{tabularx}
+\end{table}
+
+% -----------------------------------------------------
+% 7. PROCEDIMENTOS DE AVALIAÇÃO
+% -----------------------------------------------------
+\section{Procedimentos de Avaliação da Aprendizagem}
+
+A avaliação será contínua, formativa e alinhada à prática de desenvolvimento web. A nota final semestral será composta por **três instrumentos avaliativos**:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\rowcolor{cinzaCabecalho}
+\textbf{Instrumento Avaliativo} & \textbf{Descrição e Critérios de Desempenho} & \textbf{Peso} \\ \hline
+\textbf{Avaliação Teórica Única (A1)} & Prova teórica individual de verificação dos conceitos fundamentais (arquitetura modular ES6, assincronismo, \texttt{async/await}, protocolo HTTP, consumo de APIs e SPAs). & \textbf{25\%} \\ \hline
+\rowcolor{cinzaLinha}
+\textbf{Avaliação Contínua de Aulas (A2)} & \textbf{Conjunto de Participação + Pontualidade de Entrega:} Avaliação contínua do engajamento em sala de aula, presença ativa nas discussões técnicas e pontualidade na entrega dos roteiros práticos semanais desenvolvidos em laboratório. & \textbf{35\%} \\ \hline
+\textbf{Trabalho Prático Integrador / Extensão (A3)} & \textbf{Projeto Prático Integrador de Extensão:} Desenvolvimento de uma aplicação web completa com aplicação de extensão comunitária/acadêmica, integrando \textbf{todos os conteúdos do semestre} (Bootstrap 5, JS ES6 Modular, Fetch API, LocalStorage, Roteamento SPA e build Vite), hospedada no GitHub Pages com defesa demonstrativa. & \textbf{40\%} \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Critérios de Aprovação}
+\begin{itemize}[leftmargin=*]
+    \item Frequência mínima exigida de \textbf{75\%} das aulas ministradas;
+    \item Média Final (\textbf{MF}) igual ou superior a \textbf{6,0 (seis)}, calculada pela média ponderada dos instrumentos avaliativos:
+    \[
+    \text{MF} = (\text{A1} \times 0{,}25) + (\text{A2} \times 0{,}35) + (\text{A3} \times 0{,}40)
+    \]
+\end{itemize}
+
+\subsection{Recuperação Paralela da Aprendizagem}
+Conforme a Organização Didática do IFSC, o estudante com rendimento insatisfatório terá direito ao processo de recuperação paralela ao longo e ao final do semestre letivo, por meio da reexecução orientada de avaliações, refatoração de roteiros práticos e submissão atualizada do projeto de extensão no GitHub.
+
+% -----------------------------------------------------
+% 8. BIBLIOGRAFIA E REFERÊNCIAS
+% -----------------------------------------------------
+\section{Bibliografia e Fontes de Consulta}
+
+\subsection{Bibliografia Básica}
+\begin{enumerate}[leftmargin=*]
+    \item FLANAGAN, David. \textbf{JavaScript: O Guia Definitivo}. 7. ed. Porto Alegre: Bookman, 2021.
+    \item DUCKETT, Jon. \textbf{HTML e CSS: projete e construa websites}. Rio de Janeiro: Alta Books, 2014.
+    \item MOZILLA DEVELOPER NETWORK (MDN). \textbf{MDN Web Docs: HTML, CSS e JavaScript}. Mozilla Foundation. Disponível em: \url{https://developer.mozilla.org}. Acesso em: 2026.
+\end{enumerate}
+
+\subsection{Bibliografia Complementar}
+\begin{enumerate}[leftmargin=*]
+    \item FREEMAN, Adam. \textbf{Pro Bootstrap 5: Responsive Web Development}. New York: Apress, 2021.
+    \item W3SCHOOLS. \textbf{Bootstrap 5 \& JavaScript Tutorials and References}. W3Schools Web Tutorials. Disponível em: \url{https://www.w3schools.com}. Acesso em: 2026.
+    \item VITE CORE TEAM. \textbf{Vite: Next Generation Frontend Tooling}. Disponível em: \url{https://vitejs.dev}. Acesso em: 2026.
+    \item BOOTSTRAP TEAM. \textbf{Bootstrap 5 Official Documentation}. Disponível em: \url{https://getbootstrap.com}. Acesso em: 2026.
+    \item JQUERY FOUNDATION. \textbf{jQuery Official API Documentation}. Disponível em: \url{https://api.jquery.com}. Acesso em: 2026.
+\end{enumerate}
+
+\vspace{1.2cm}
+
+% -----------------------------------------------------
+% 9. ASSINATURAS INSTITUCIONAIS
+% -----------------------------------------------------
+\begin{center}
+\small
+Garopaba (SC), \dots\dots\dots de \dots\dots\dots\dots\dots\dots\dots\dots\dots de 2026.
+
+\vspace{1.8cm}
+
+\begin{minipage}{0.45\textwidth}
+\centering
+\hrulefill \\
+\textbf{Prof. André Moraes}\\
+Docente Responsável — IFSC Garopaba
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\centering
+\hrulefill \\
+\textbf{Coordenadoria do Curso}\\
+CST em Sistemas para a Internet
+\end{minipage}
+\end{center}
+
+\end{document}

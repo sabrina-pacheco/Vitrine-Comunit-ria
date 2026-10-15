@@ -1,0 +1,1380 @@
+\section{Roteiro Prático 04 — Arquitetura Frontend Modular: ES6 Modules \& Padrão em Camadas}
+
+% =====================================================
+% OBJETIVOS DA ATIVIDADE
+% =====================================================
+
+\begin{boxObjetivos}
+\textbf{Objetivos da Atividade (Módulo 2 — ES6 Modules \& Padrão em Camadas)}
+
+Ao final desta prática orientada em laboratório, o estudante será capaz de:
+
+\begin{itemize}
+\item Superar a arquitetura monolítica de arquivo único (\texttt{app.js}), organizando o frontend em múltiplos módulos especializados utilizando \textbf{ES6 Modules} (\texttt{import} e \texttt{export});
+\item Declarar o ponto de entrada modular na página web através da diretiva:\\ \texttt{<script type="module" src="js/main.js"></script>};
+\item Compreender e aplicar a separação estrita de responsabilidades no cliente em três camadas:
+  \begin{itemize}
+    \item \textbf{Camada de Serviços (\texttt{services/}):} Regras de negócio, cálculos e persistência pura no \texttt{localStorage} sem acoplamento ao DOM;
+    \item \textbf{Camada de Visão (\texttt{views/}):} Renderização de cards, tabelas, modais e Toasts via \textit{template literals} do Bootstrap 5;
+    \item \textbf{Camada Utilitária (\texttt{utils/}):} Funções puras reutilizáveis de formatação (moeda brasileira, telefone, máscaras);
+    \item \textbf{Orquestrador Central (\texttt{main.js}):} Captura de eventos do usuário e coordenação entre camadas.
+  \end{itemize}
+\item Implementar o \textbf{CRUD Completo} (\textit{Create, Read, Update, Delete}) com persistência em armazenamento local;
+\item Implementar \textbf{validação visual no cliente} com feedback imediato ao usuário utilizando as classes nativas do Bootstrap 5 (\texttt{.was-validated} e \texttt{.invalid-feedback});
+\item Disparar notificações flutuantes dinâmicas (\textbf{Bootstrap Toasts}) para confirmar operações de cadastro, alteração e exclusão;
+\item Implementar filtragem reativa em tempo real por categoria de serviço na vitrine comunitária.
+\end{itemize}
+\end{boxObjetivos}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{roteiro4_vitrine.jpg}
+    \caption{Visão Geral da Aplicação: Vitrine Comunitária de Garopaba com arquitetura modular em camadas ES6, modais e Toasts.}
+    \label{fig:preview_roteiro4}
+\end{figure}
+
+% =====================================================
+% INTRODUÇÃO E CONTEXTUALIZAÇÃO
+% =====================================================
+
+\subsection{Introdução e Contextualização do Projeto}
+
+Nos Roteiros 1, 2 e 3, trabalhamos com scripts JavaScript concentrados em um único arquivo (\texttt{app.js}). Embora essa abordagem seja excelente para aprender os fundamentos, ela se torna inviável em aplicações reais de médio e grande porte, onde a mistura de seletores do DOM, regras de validação e persistência gera o chamado \textit{"código espaguete"}.
+
+No \textbf{Roteiro Prático 04}, damos o passo definitivo rumo à arquitetura profissional de software no frontend. Desenvolveremos a \textbf{Vitrine Comunitária de Empreendedores Locais de Garopaba}, uma aplicação que permite cadastrar, listar, filtrar, editar e gerenciar serviços da comunidade local. 
+
+Este projeto serve também como a \textbf{base tecnológica inicial para a Ação Curricularizada de Extensão na SNCT (Semana Nacional de Ciência e Tecnologia)}.
+
+% =====================================================
+% ESTRUTURA DE DIRETÓRIOS DO PROJETO
+% =====================================================
+
+\subsection{Estrutura Arquitetural de Pastas}
+
+O projeto deve ser organizado na pasta \texttt{roteiro-4/exercicio-roteiro4/} seguindo rigorosamente a estrutura modular:
+
+\begin{boxCodigo}
+\textbf{Árvore de Diretórios Modular do Projeto:}
+
+\fontsize{8.5pt}{11pt}\selectfont
+\begin{verbatim}
+roteiro-4/exercicio-roteiro4/
+|-- index.html     <-- Vitrine e forms (BS5)
+|-- styles.css     <-- Estilos e transições
+`-- js/
+    |-- main.js    <-- Orquestrador central
+    |-- services/
+    |   `-- vitrineService.js <-- CRUD Storage
+    |-- views/
+    |   `-- vitrineView.js    <-- HTML dinâmico
+    `-- utils/
+        `-- formatters.js     <-- Formatações
+\end{verbatim}
+\end{boxCodigo}
+
+% =====================================================
+% FUNDAMENTAÇÃO TEÓRICA: COMPONENTES DE INTERFACE
+% =====================================================
+
+\subsection{Fundamentação Teórica: Componentes Modernos de Interface (Bootstrap 5)}
+
+Antes de iniciarmos a implementação prática guiada, é fundamental compreender a finalidade, o comportamento e a anatomia dos principais componentes de interface gráfica utilizados na aplicação:
+
+\subsubsection{1. Janelas Modais (\textit{Modals}): Diálogos Sobrepostos de Alta Atenção}
+Uma \textbf{janela modal} (ou diálogo modal) é um elemento flutuante que surge acima de todo o conteúdo da página, bloqueando temporariamente a interação com a tela de fundo por meio de uma camada escurecida semi-transparente chamada \textbf{\textit{backdrop}}.
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Finalidade de Uso:} Concentrar a atenção exclusiva do usuário em uma tarefa crítica (como preencher o formulário de cadastro ou atualizar dados de um serviço) sem sair da tela atual nem recarregar o navegador (\textit{Single Page Application}).
+\end{itemize}
+
+\vspace{-0.15cm}
+\begin{mockupNavegador}[Croqui Anatômico do Componente Modal (Bootstrap 5)]
+  \begin{tcolorbox}[
+      enhanced,
+      colback=gray!25, colframe=gray!25,
+      arc=4pt, boxrule=0pt,
+      top=4pt, bottom=4pt, left=8pt, right=8pt
+  ]
+    \centering
+    % Indicador de Backdrop
+    \hfill \colorbox{black!60}{\color{white}\tiny\bfseries Fundo escurecido: .modal-backdrop} \hspace{4pt}\\[2pt]
+
+    % Janela Modal Flutuante (.modal-dialog)
+    \begin{tcolorbox}[
+        enhanced,
+        width=0.94\linewidth,
+        colback=white, colframe=azulTitulo!70,
+        arc=5pt, boxrule=1pt,
+        shadow={1.5mm}{-1.5mm}{0mm}{black!15},
+        top=0pt, bottom=0pt, left=0pt, right=0pt
+    ]
+      % 1. Modal Header
+      \begin{tcolorbox}[
+          colback=azulTitulo!8, colframe=azulTitulo!30,
+          arc=4pt, sharp corners=downhill,
+          boxrule=0pt, bottomrule=0.6pt,
+          top=3pt, bottom=3pt, left=8pt, right=8pt
+      ]
+        \colorbox{azulTitulo}{\color{white}\tiny\bfseries 1. .modal-header}
+        \hspace{4pt}
+        \textbf{\small Título do Diálogo (\texttt{.modal-title})}
+        \hfill
+        \fboxsep=2pt\fcolorbox{gray!50}{white}{\tiny\textbf{\textsf{\color{gray}[ $\times$ ]}}}
+        \hspace{2pt}
+        \colorbox{gray!60}{\color{white}\tiny\bfseries .btn-close}
+      \end{tcolorbox}
+
+      % 2. Modal Body
+      \begin{tcolorbox}[
+          colback=white, colframe=white,
+          boxrule=0pt,
+          top=3pt, bottom=3pt, left=8pt, right=8pt
+      ]
+        \colorbox{azulTitulo!80}{\color{white}\tiny\bfseries 2. .modal-body}
+        \hfill
+        {\tiny\color{gray!80}\textit{(Área central de entrada e validação de dados)}}
+        \vspace{2pt}
+
+        \scriptsize
+        \textbf{Rótulo (\texttt{.form-label}):} {\color{red}*}\\
+        \fboxsep=3pt\fcolorbox{gray!30}{gray!5}{\makebox[0.96\linewidth][l]{\color{gray!70}\quad Campo de entrada (\texttt{.form-control})}}
+        
+        \vspace{2pt}
+        \begin{minipage}[t]{0.48\linewidth}
+          \textbf{Seleção (\texttt{.form-select}):} {\color{red}*}\\
+          \fboxsep=3pt\fcolorbox{gray!30}{gray!5}{\makebox[0.92\linewidth][l]{\color{gray!70}\quad Opções... $\downarrow$}}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{0.48\linewidth}
+          \textbf{Validação Contextual:}\\
+          \fboxsep=3pt\fcolorbox{gray!30}{gray!5}{\makebox[0.92\linewidth][l]{\color{gray!70}\quad Feedback visual}}
+        \end{minipage}
+
+        \vspace{2pt}
+        \textit{\tiny\color{gray!80} Campo Oculto de Controle: \texttt{<input type="hidden" id="servicoId">} (diferencia Create vs Update)}
+      \end{tcolorbox}
+
+      % 3. Modal Footer
+      \begin{tcolorbox}[
+          colback=gray!8, colframe=gray!25,
+          arc=4pt, sharp corners=uphill,
+          boxrule=0pt, toprule=0.6pt,
+          top=3pt, bottom=3pt, left=8pt, right=8pt
+      ]
+        \colorbox{azulTitulo!80}{\color{white}\tiny\bfseries 3. .modal-footer}
+        \hfill
+        \colorbox{gray!30}{\scriptsize Cancelar (\texttt{data-bs-dismiss="modal"})}
+        \hspace{4pt}
+        \colorbox{ifscGreen}{\color{white}\scriptsize\bfseries Ação Principal (\texttt{type="submit"})}
+      \end{tcolorbox}
+    \end{tcolorbox}
+  \end{tcolorbox}
+\end{mockupNavegador}
+
+\vspace{0.1cm}
+\noindent\textbf{Anatomia no Bootstrap 5 (conforme ilustrado acima):}
+\vspace{0.1cm}
+
+\noindent
+\begin{tcolorbox}[
+    enhanced,
+    colback=white,
+    colframe=azulTitulo!60,
+    arc=4pt,
+    boxrule=0.8pt,
+    top=0pt, bottom=0pt, left=0pt, right=0pt,
+    shadow={1mm}{-1mm}{0mm}{black!8}
+]
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X}
+\rowcolor{azulTitulo}
+\textbf{\color{white}\footnotesize Elemento / Classe} & 
+\textbf{\color{white}\footnotesize Camada Anatômica} & 
+\textbf{\color{white}\footnotesize Papel Arquitetural e Comportamento} \\
+\rowcolor{white}
+\colorbox{azulTitulo!8}{\textbf{\texttt{.modal}}} & 
+Contêiner Base & 
+Invisível por padrão (\texttt{display: none}), ativa a transição animada suave (\texttt{.fade}) e o bloqueio de tela (\textit{backdrop}). \\
+\hline
+\rowcolor{cinzaFundo}
+\colorbox{azulTitulo!8}{\textbf{\texttt{.modal-dialog}}} & 
+Geometria \& Posição & 
+Controla largura responsiva e o alinhamento vertical no viewport via \texttt{.modal-dialog-centered}. \\
+\hline
+\rowcolor{white}
+\colorbox{azulTitulo!8}{\textbf{\texttt{.modal-content}}} & 
+Invólucro do Diálogo & 
+Superfície branca com cantos arredondados e elevação (\texttt{.shadow-lg}), estruturada em 3 seções: \\
+\hline
+\rowcolor{cinzaFundo}
+\hspace*{4pt}\colorbox{azulTitulo!12}{\textbf{\texttt{.modal-header}}} & 
+1. Cabeçalho & 
+Título da ação (\texttt{.modal-title}) e botão de fechar nativo (\texttt{.btn-close} com \texttt{data-bs-dismiss="modal"}). \\
+\hline
+\rowcolor{white}
+\hspace*{4pt}\colorbox{azulTitulo!12}{\textbf{\texttt{.modal-body}}} & 
+2. Corpo Central & 
+Área nobre do formulário com rótulos, campos de entrada, validações e campo oculto de controle (\texttt{\#servicoId}). \\
+\hline
+\rowcolor{cinzaFundo}
+\hspace*{4pt}\colorbox{azulTitulo!12}{\textbf{\texttt{.modal-footer}}} & 
+3. Rodapé de Ações & 
+Área de decisão e submissão com botões de controle (\textit{Cancelar} e \textit{Salvar}). \\
+\hline
+\rowcolor{white}
+\colorbox{azulTitulo!8}{\textbf{\texttt{bootstrap.Modal}}} & 
+Controle JavaScript & 
+Instanciação programática (\texttt{getOrCreateInstance}) para abertura (\texttt{.show()}) e fechamento (\texttt{.hide()}).
+\end{tabularx}
+\end{tcolorbox}
+\vspace{0.15cm}
+
+\subsubsection{2. Notificações Flutuantes (\textit{Toasts}): Feedback Assíncrono Não-Intrusivo}
+O componente \textbf{Toast} é uma notificação compacta e temporária que surge sobreposta em uma posição fixa da tela (canto superior direito) para confirmar o sucesso de operações (ex: \textit{"Serviço cadastrado com sucesso!"}).
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Vantagem sobre o \texttt{alert()}:} O diálogo nativo \texttt{window.alert()} é síncrono e bloqueante: ele congela a execução de qualquer outro script JavaScript no navegador e força o usuário a clicar em "OK" para continuar. O \textbf{Toast}, por outro lado, é assíncrono, suave e desaparece automaticamente após alguns segundos (\textit{autohide}), proporcionando uma experiência de usuário profissional;
+  \item \textbf{Posicionamento com \texttt{.toast-container}:} O elemento contêiner utiliza classes utilitárias de posicionamento fixo (\texttt{position-fixed top-0 end-0 p-3}) com índice z prioritário (\texttt{z-index: 1090}), garantindo visibilidade imediata sem deslocar os demais elementos do layout.
+\end{itemize}
+
+\subsubsection{3. Cartões de Conteúdo (\textit{Cards}): Unidades Modulares e Grid Uniforme}
+Um \textbf{Card} é um contêiner retangular flexível (\texttt{.card .shadow-sm}) que agrupa de forma coesa todas as informações e ações pertinentes a um único registro:
+
+\vspace{-0.15cm}
+\begin{center}
+\begin{tcolorbox}[
+    enhanced,
+    width=0.92\linewidth,
+    colback=white, colframe=azulTitulo!70,
+    arc=5pt, boxrule=1pt,
+    shadow={1.5mm}{-1.5mm}{0mm}{black!12},
+    top=0pt, bottom=0pt, left=0pt, right=0pt
+]
+  % Rotulo Geral do Componente
+  \begin{tcolorbox}[
+      colback=azulTitulo!8, colframe=azulTitulo!25,
+      arc=4pt, sharp corners=downhill,
+      boxrule=0pt, bottomrule=0.6pt,
+      top=3pt, bottom=3pt, left=8pt, right=8pt
+  ]
+    \colorbox{azulTitulo}{\color{white}\tiny\bfseries .card .h-100 .shadow-sm}
+    \hspace{4pt}
+    \textbf{\footnotesize Croqui Anatômico do Card de Serviço}
+    \hfill
+    {\tiny\color{gray!80}\textit{(Renderizado dinamicamente via vitrineView.js)}}
+  \end{tcolorbox}
+
+  % 1. Card Body (.card-body)
+  \begin{tcolorbox}[
+      colback=white, colframe=white,
+      boxrule=0pt,
+      top=4pt, bottom=4pt, left=8pt, right=8pt
+  ]
+    \colorbox{azulTitulo!80}{\color{white}\tiny\bfseries 1. .card-body}
+    \vspace{2pt}
+
+    % Topo com Badge e Preço
+    \colorbox{blue!12}{\color{blue!80!black}\scriptsize\bfseries .badge (Categoria)}
+    \hfill
+    {\normalsize\bfseries\color{ifscGreen} R\$ 25,00}
+    \hspace{2pt}
+    \colorbox{gray!20}{\tiny\texttt{formatarMoeda()}}
+
+    \vspace{2pt}
+    {\large\bfseries Nome do Empreendimento (\texttt{.card-title})}
+
+    \vspace{2pt}
+    {\footnotesize\color{gray!80} \textbf{Bairro / Localização (\texttt{.card-subtitle}):} Ferrugem \quad \textbar \quad \textbf{ID:} \texttt{1729482103}}
+
+    \vspace{2pt}
+    {\small\color{gray!90} Texto descritivo dos diferenciais do serviço (\texttt{.card-text .small})...}
+  \end{tcolorbox}
+
+  % 2. Card Footer (.card-footer)
+  \begin{tcolorbox}[
+      colback=gray!6, colframe=gray!25,
+      arc=4pt, sharp corners=uphill,
+      boxrule=0pt, toprule=0.6pt,
+      top=3pt, bottom=3pt, left=8pt, right=8pt
+  ]
+    \colorbox{azulTitulo!80}{\color{white}\tiny\bfseries 2. .card-footer}
+    \hfill
+    \colorbox{ifscGreen}{\color{white}\scriptsize\bfseries WhatsApp (\texttt{wa.me})}
+    \hspace{4pt}
+    \colorbox{orange!15}{\color{orange!85!black}\scriptsize\bfseries Editar}
+    \hspace{2pt}
+    \colorbox{red!15}{\color{red!80!black}\scriptsize\bfseries Excluir}
+  \end{tcolorbox}
+\end{tcolorbox}
+\end{center}
+\vspace{-0.15cm}
+
+\vspace{0.1cm}
+\noindent\textbf{Anatomia no Bootstrap 5 (conforme ilustrado acima):}
+\vspace{0.1cm}
+
+\noindent
+\begin{tcolorbox}[
+    enhanced,
+    colback=white,
+    colframe=azulTitulo!60,
+    arc=4pt,
+    boxrule=0.8pt,
+    top=0pt, bottom=0pt, left=0pt, right=0pt,
+    shadow={1mm}{-1mm}{0mm}{black!8}
+]
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X}
+\rowcolor{azulTitulo}
+\textbf{\color{white}\footnotesize Elemento / Classe} & 
+\textbf{\color{white}\footnotesize Camada Anatômica} & 
+\textbf{\color{white}\footnotesize Papel Arquitetural e Comportamento} \\
+\rowcolor{white}
+\colorbox{azulTitulo!8}{\textbf{\texttt{.card}}} & 
+Contêiner Modular & 
+Unidade visual básica com borda suave e elevação sutil (\texttt{.shadow-sm}) que agrupa os dados de um serviço. \\
+\hline
+\rowcolor{cinzaFundo}
+\colorbox{azulTitulo!8}{\textbf{\texttt{.h-100}}} & 
+Equalização Vertical & 
+Força 100\% da altura da coluna no grid Flexbox, garantindo nivelamento e alinhamento visual uniforme na vitrine. \\
+\hline
+\rowcolor{white}
+\hspace*{4pt}\colorbox{azulTitulo!12}{\textbf{\texttt{.card-body}}} & 
+1. Corpo Principal & 
+Abriga a badge de categoria, o título comercial (\texttt{.card-title}), o preço formatado, a localização e a descrição. \\
+\hline
+\rowcolor{cinzaFundo}
+\hspace*{4pt}\colorbox{azulTitulo!12}{\textbf{\texttt{.card-footer}}} & 
+2. Rodapé de Ações & 
+Fundo neutro transparente (\texttt{.bg-transparent}) agrupando os botões de ação: WhatsApp, Editar e Excluir.
+\end{tabularx}
+\end{tcolorbox}
+\vspace{0.15cm}
+
+\subsubsection{4. Validação Visual e o Campo Oculto (\texttt{type="hidden"})}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Atributo \texttt{novalidate}:} Informa ao navegador para suprimir os balões de validação nativos, permitindo que a aplicação assuma o controle visual das mensagens de erro com o Bootstrap: ao adicionar a classe \texttt{.was-validated} ao formulário, cada campo é colorido conforme o resultado da validação nativa do HTML5 (verde para válido, vermelho para inválido) e os contêineres contextuais \texttt{.invalid-feedback} dos campos inválidos são exibidos;
+  \item \textbf{Papel Arquitetural do Campo Oculto (\texttt{\#servicoId}):} O campo com \texttt{type="hidden"} não é renderizado visualmente para o usuário, mas é o elemento-chave que diferencia as operações de \textbf{Criação} (\textit{Create}) e \textbf{Atualização} (\textit{Update}) no padrão CRUD: se o campo estiver vazio, o clique em "Salvar" cria um novo serviço; se contiver um ID, atualiza o serviço correspondente mantendo o identificador original.
+\end{itemize}
+
+% =====================================================
+% FUNDAMENTAÇÃO TEÓRICA: ES6 MODULES
+% =====================================================
+
+\subsection{Fundamentação Teórica: Arquitetura Modular com ES6 Modules}
+
+\subsubsection{1. Declaração no HTML (\texttt{type="module"})}
+Ao declarar \texttt{<script type="module" src="js/main.js"></script>}, o navegador aplica comportamentos modernos essenciais:
+\begin{itemize}
+  \item \textbf{Modo Estrito Automático (\texttt{"use strict"}):} Impede o uso de variáveis não declaradas e falhas silenciosas;
+  \item \textbf{Escopo Fechado de Módulo:} Variáveis e funções criadas dentro de um arquivo não poluem o escopo global (\texttt{window});
+  \item \textbf{Carregamento Assíncrono com Adiamento (\texttt{defer}):} O script aguarda o parsing completo do DOM antes de executar.
+\end{itemize}
+
+\subsubsection{2. Exportação e Importação (\texttt{export} e \texttt{import})}
+Para compartilhar recursos entre arquivos, usamos a sintaxe explícita de módulos:
+
+\textbf{Exemplo de Exportação Nomeada e Importação:}
+
+\begin{boxCodigoJS}
+// No arquivo js/utils/formatters.js
+export function formatarTelefone(telefone) {
+  return telefone.replace(
+    /^(\d{2})(\d{5})(\d{4})/,
+    '($1) $2-$3'
+  );
+}
+
+// No arquivo js/main.js
+import { formatarTelefone }
+  from './utils/formatters.js';
+
+// Resultado: (48) 99999-8888
+console.log(formatarTelefone('48999998888'));
+\end{boxCodigoJS}
+
+% =====================================================
+% PIPELINE VISUAL DA ATIVIDADE
+% =====================================================
+
+\providecolor{ifscGreen}{RGB}{22,163,74}
+\vspace{0.4cm}
+\begin{figure}[H]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    node distance=0.8cm and 0.5cm,
+    every node/.style={font=\small},
+    etapa/.style={
+        rectangle,
+        rounded corners=5pt,
+        draw=azulTitulo,
+        thick,
+        minimum width=4.9cm,
+        minimum height=1.75cm,
+        text width=4.7cm,
+        align=center,
+        fill=azulTitulo!6
+    },
+    etapaHighlight/.style={
+        rectangle,
+        rounded corners=5pt,
+        draw=ifscGreen,
+        thick,
+        minimum width=4.9cm,
+        minimum height=1.75cm,
+        text width=4.7cm,
+        align=center,
+        fill=ifscGreen!10
+    },
+    seta/.style={
+        -{Latex[length=2.5mm]},
+        thick,
+        draw=azulTitulo
+    }
+]
+
+% Linha 1: Estrutura Base e Serviços
+\node[etapa] (p1) {\textbf{Passo 1: HTML5 \& Bootstrap}\\\footnotesize Estrutura base, modais, toasts e\\\texttt{<script type="module">}};
+
+\node[etapa, right=of p1] (p2) {\textbf{Passo 2: Utilitários Puros}\\\footnotesize \texttt{formatters.js}: moedas, fone e\\\texttt{escapeHtml} contra XSS};
+
+\node[etapa, right=of p2] (p3) {\textbf{Passo 3: Camada de Serviços}\\\footnotesize \texttt{vitrineService.js}: CRUD puro\\(\textit{Create, Read, Update, Delete})};
+
+% Linha 2: Interface e Orquestração
+\node[etapa, below=of p3] (p4) {\textbf{Passo 4: Camada de Visão}\\\footnotesize \texttt{vitrineView.js}: cards dinâmicos,\\estado vazio e feedback Toast};
+
+\node[etapa, left=of p4] (p5) {\textbf{Passo 5: Orquestrador Central}\\\footnotesize \texttt{main.js}: validação nativa BS5,\\filtros reativos e eventos CRUD};
+
+\node[etapaHighlight, left=of p5] (p6) {\textbf{Conclusão \& Deploy}\\\footnotesize Teste do ciclo completo e deploy\\automático no \textbf{GitHub Pages}};
+
+% Conexões do fluxo
+\draw[seta] (p1) -- (p2);
+\draw[seta] (p2) -- (p3);
+\draw[seta] (p3) -- (p4);
+\draw[seta] (p4) -- (p5);
+\draw[seta] (p5) -- (p6);
+
+\end{tikzpicture}%
+}
+\caption{Pipeline arquitetural e sequência cronológica de implementação do Roteiro 04.}
+\end{figure}
+
+\begin{tcolorbox}[
+    colback=azulTitulo!5, colframe=azulTitulo!80,
+    boxrule=0.8pt, arc=4pt, left=10pt, right=10pt, top=6pt, bottom=6pt
+]
+\textbf{\color{azulTitulo}Links diretos para o GitHub (Código-Fonte de Referência):}
+
+Caso prefira consultar, clonar ou comparar os arquivos diretamente no repositório:
+\begin{itemize}[leftmargin=*, nosep]
+  \item \textbf{index.html} $\rightarrow$ {\small\url{https://github.com/chameoandre/CST-Sistemas-para-internet-programacao-para-internet-2/blob/main/roteiro4-novamente/index.html}}
+  \item \textbf{main.js (orquestrador)} $\rightarrow$ {\small\url{https://github.com/chameoandre/CST-Sistemas-para-internet-programacao-para-internet-2/blob/main/roteiro4-novamente/js/main.js}}
+  \item \textbf{styles.css} $\rightarrow$ {\small\url{https://github.com/chameoandre/CST-Sistemas-para-internet-programacao-para-internet-2/blob/main/roteiro4-novamente/styles.css}}
+  \item \textbf{formatters.js} $\rightarrow$ {\small\url{https://github.com/chameoandre/CST-Sistemas-para-internet-programacao-para-internet-2/blob/main/roteiro4-novamente/js/utils/formatters.js}}
+  \item \textbf{vitrineService.js} $\rightarrow$ {\small\url{https://github.com/chameoandre/CST-Sistemas-para-internet-programacao-para-internet-2/blob/main/roteiro4-novamente/js/services/vitrineService.js}}
+  \item \textbf{vitrineView.js} $\rightarrow$ {\small\url{https://github.com/chameoandre/CST-Sistemas-para-internet-programacao-para-internet-2/blob/main/roteiro4-novamente/js/views/vitrineView.js}}
+\end{itemize}
+\end{tcolorbox}
+
+% =====================================================
+% PASSO A PASSO GUIADO DA ATIVIDADE
+% =====================================================
+
+\clearpage
+\subsection{Passo a Passo Guiado do Roteiro}
+
+\begin{tcolorbox}[
+    colback=azulTitulo!5, colframe=azulTitulo!80,
+    boxrule=0.8pt, arc=4pt, left=8pt, right=8pt, top=6pt, bottom=6pt
+]
+\textbf{\color{azulTitulo}Antes de começar:}
+\begin{itemize}[leftmargin=*, nosep]
+  \item \textbf{Abra sempre pelo Live Server.} Módulos ES6 não carregam quando o \texttt{index.html} é aberto com duplo clique (endereço \texttt{file://}).
+  \item \textbf{Ao copiar código deste PDF}, copie uma página por vez. Quando um bloco continua na página seguinte, o cabeçalho e o rodapé do documento vêm junto na seleção e precisam ser apagados.
+  \item \textbf{Código no GitHub:} Os links diretos para cada arquivo no repositório estão disponíveis no quadro da página anterior.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{boxAtividade}[{Fase 1.1/5: Estrutura HTML5 Base e Ponto de Entrada (index.html)}]
+\textbf{Responsabilidade Arquitetural:} Estabelecer o esqueleto visual da página, carregar as dependências de estilo (Bootstrap 5 e Icons), fornecer os pontos de ancoragem da interface (\texttt{\#vitrineContainer}, \texttt{\#toastNotificacao}, \texttt{\#totalServicosBadge} e \texttt{\#filtroCategoria}) e conectar o módulo raiz \texttt{js/main.js}.
+\end{boxAtividade}
+
+\vspace{-0.1cm}
+\begin{mockupNavegador}[Interface Base: aparência final (após os Passos 1.3 e 5)]
+  % Hero Banner
+  \begin{tcolorbox}[colback=ifscGreen!85!black, colframe=ifscGreen!85!black, arc=3pt, boxrule=0pt, top=4pt, bottom=4pt, left=8pt, right=8pt]
+    \colorbox{yellow!90!black}{\color{black}\tiny\bfseries ROTEIRO 04}
+    \hspace{2pt}
+    \colorbox{white}{\color{ifscGreen!85!black}\tiny\bfseries ES6 MODULES}
+    \vspace{2pt}\\
+    {\color{white}\bfseries\small Vitrine Comunitária de Empreendedores}
+    \hfill
+    \colorbox{white!20}{\color{white}\scriptsize\bfseries 3 Serviços Cadastrados}
+    \hspace{4pt}
+    \colorbox{yellow!90!black}{\color{black}\scriptsize\bfseries + Divulgar Serviço}
+    \vspace{1pt}\\
+    {\tiny\color{white!80}Guia de serviços e comércios locais de Garopaba (SC) --- Projeto Base de Extensão Universitária}
+  \end{tcolorbox}
+  
+  \vspace{3pt}
+  % Card de Filtros
+  \begin{tcolorbox}[colback=white, colframe=gray!25, arc=3pt, boxrule=0.6pt, top=4pt, bottom=4pt, left=8pt, right=8pt]
+    \footnotesize\textbf{Filtrar por Categoria:} \hspace{4pt}
+    \fboxsep=2pt\fcolorbox{gray!30}{gray!5}{\scriptsize\ttfamily Todas as Categorias $\downarrow$}
+    \hfill
+    {\tiny\color{gray!70}\texttt{js/services/} \quad \texttt{js/views/} \quad \texttt{js/utils/}}
+  \end{tcolorbox}
+
+  \vspace{3pt}
+  % Area Dinamica (vitrineContainer)
+  \begin{tcolorbox}[borderline={0.6pt}{0pt}{gray!40,dashed}, colback=gray!3, colframe=gray!40, arc=3pt, boxrule=0pt, top=8pt, bottom=8pt, halign=center]
+    \footnotesize\color{gray!80}\textbf{Ponto de Montagem Dinâmica (\texttt{\#vitrineContainer})}\\
+    \scriptsize\color{gray!60}(Área central onde os cards gerados pela camada de apresentação serão inseridos via JavaScript)
+  \end{tcolorbox}
+\end{mockupNavegador}
+
+\begin{boxCodigoHTML}
+<!-- index.html (Parte 1: Estrutura Base e Scripts) -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitrine Comunitária de Garopaba — Roteiro 04 (ES6 Modules)</title>
+  <!-- Bootstrap 5 CSS, Icons & Google Fonts -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&display=swap">
+  <link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Container de Toasts com corpo #toastMensagem -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090;">
+    <div id="toastNotificacao"
+         class="toast align-items-center text-bg-success border-0 shadow-lg"
+         role="alert">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill fs-5"></i>
+          <div>
+            <strong id="toastTitulo" class="d-block">Sucesso!</strong>
+            <span id="toastMensagem">Operação realizada com êxito.</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Banner com Tipografia Outfit e Badges -->
+  <header class="hero-banner shadow-sm">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-warning text-dark font-outfit fw-bold px-3 py-2 rounded-pill">
+              <i class="bi bi-code-slash me-1"></i> ROTEIRO PRÁTICO 04
+            </span>
+            <span class="badge bg-white text-success font-outfit fw-bold px-3 py-2 rounded-pill">
+              ES6 MODULES &amp; ARQUITETURA EM CAMADAS
+            </span>
+          </div>
+          <h1 class="display-6 fw-bold font-outfit mb-1">Vitrine Comunitária de Empreendedores</h1>
+          <p class="mb-0 opacity-75 small">
+            Guia de serviços e comércios locais de Garopaba (SC) —
+            Projeto Base de Extensão Universitária
+          </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge-counter" id="totalServicosBadge">Carregando...</span>
+          <button data-bs-toggle="modal" data-bs-target="#modalCadastro"
+            class="btn btn-warning text-dark font-outfit fw-bold px-3 py-2 rounded-pill shadow-sm">
+            <i class="bi bi-plus-circle-fill me-1"></i> Divulgar Serviço
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mb-5">
+    <!-- Barra de Controle e Filtros -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-white">
+      <div class="row g-3 align-items-center justify-content-between">
+        <div class="col-md-5">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="bi bi-funnel-fill text-muted"></i>
+            </span>
+            <select class="form-select border-start-0 bg-light" id="filtroCategoria">
+              <option value="todas">Todas as Categorias</option>
+              <option value="Alimentação">Alimentação &amp; Gastronomia</option>
+              <option value="Tecnologia">Tecnologia &amp; Internet</option>
+              <option value="Artesanato">Artesanato &amp; Arte Local</option>
+              <option value="Serviços Gerais">Serviços Gerais &amp; Reformas</option>
+              <option value="Turismo">Turismo &amp; Passeios</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-7 text-md-end text-muted small">
+          <span class="badge bg-light text-dark border me-1">
+            <i class="bi bi-folder-fill text-warning me-1"></i> js/services/
+          </span>
+          <span class="badge bg-light text-dark border me-1">
+            <i class="bi bi-layout-text-window-reverse text-info me-1"></i> js/views/
+          </span>
+          <span class="badge bg-light text-dark border">
+            <i class="bi bi-gear-wide-connected text-success me-1"></i> js/utils/
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ponto de Montagem dos Cards Dinâmicos -->
+    <div class="row" id="vitrineContainer"></div>
+  </main>
+
+  <!-- Bootstrap Bundle JS + Entrada Modular ES6 -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
+\end{boxCodigoHTML}
+
+\begin{boxTeste}[{Checkpoint de Validação 1.1: Como Testar no Navegador}]
+Abra o \texttt{index.html} no navegador via \textbf{Live Server}:
+\begin{enumerate}[leftmargin=*, nosep]
+  \item Título, badges, contador (\textit{"Carregando..."}) e botão \textbf{"Divulgar Serviço"} visíveis (o degradê verde do banner só surgirá com o \texttt{styles.css} no Passo 1.3);
+  \item Seletor de categorias locais e badges dos módulos visíveis e funcionais;
+  \item Área central vazia, pronta para receber os cards dinâmicos via JavaScript.
+\end{enumerate}
+\textit{Nota: Erros 404 no Console para \texttt{styles.css} e \texttt{js/main.js} são esperados até os Passos 1.3 e 5. O modal abrirá após estruturado no Passo 1.2.}
+\end{boxTeste}
+
+\clearpage
+\begin{boxAtividade}[{Fase 1.2/5: Formulário Modal de Cadastro e Edição (index.html)}]
+\textbf{Responsabilidade Arquitetural:} Fornecer a interface de diálogo acessível para inserção e atualização de serviços, contendo validações visuais nativas do HTML5 (\texttt{required}), seletores padronizados e um campo oculto (\texttt{\#servicoId}) que diferencia operações de \textit{Create} (novo) e \textit{Update} (edição).
+\end{boxAtividade}
+
+\begin{tcolorbox}[
+    colback=azulTitulo!5, colframe=azulTitulo!80,
+    boxrule=0.8pt, arc=4pt, left=8pt, right=8pt, top=6pt, bottom=6pt
+]
+\textbf{\color{azulTitulo}Onde e como inserir este código no \texttt{index.html}:}
+\begin{itemize}[leftmargin=*, nosep]
+  \item \textbf{Atenção: Não apague nem substitua} o código estruturado no Passo 1.1! Todo o documento construído anteriormente permanece intacto.
+  \item \textbf{Local exato de inserção:} Insira o bloco completo do modal logo após a tag de fechamento \texttt{</main>} e imediatamente antes das tags de script (\texttt{<!-- Bootstrap Bundle JS... -->}).
+\end{itemize}
+\end{tcolorbox}
+
+\vspace{-0.1cm}
+\begin{mockupNavegador}[Navegador Web: index.html (Diálogo Modal Ativo)]
+  \begin{tcolorbox}[enhanced, colback=gray!25, colframe=gray!25, arc=3pt, boxrule=0pt, top=8pt, bottom=8pt, left=12pt, right=12pt]
+    % Janela Modal Flutuante
+    \begin{tcolorbox}[colback=white, colframe=gray!35, arc=5pt, boxrule=0.8pt, shadow={1.5mm}{-1.5mm}{0mm}{black!15}, top=6pt, bottom=6pt, left=10pt, right=10pt]
+      % Cabecalho do Modal
+      {\small\bfseries Cadastrar Serviço na Vitrine}
+      \hfill
+      {\footnotesize\textbf{\textsf{\color{gray}[ $\times$ ]}}}
+      \par\vspace{2pt}\textcolor{gray!30}{\hrulefill}\vspace{4pt}
+      
+      % Corpo do Formulario
+      \scriptsize
+      \textbf{Nome do Empreendimento:} {\color{red}*}\\
+      \fboxsep=3pt\fcolorbox{gray!30}{white}{\makebox[0.96\linewidth][l]{\color{gray!70}\quad Ex: Padaria Artesanal Ferrugem}}
+      
+      \vspace{4pt}
+      \begin{minipage}[t]{0.48\linewidth}
+        \textbf{Categoria:} {\color{red}*}\\
+        \fboxsep=3pt\fcolorbox{gray!30}{white}{\makebox[0.92\linewidth][l]{\color{gray!70}\quad Selecione... $\downarrow$}}
+      \end{minipage}
+      \hfill
+      \begin{minipage}[t]{0.48\linewidth}
+        \textbf{Bairro:} {\color{red}*}\\
+        \fboxsep=3pt\fcolorbox{gray!30}{white}{\makebox[0.92\linewidth][l]{\color{gray!70}\quad Ex: Ferrugem}}
+      \end{minipage}
+      
+      \vspace{4pt}
+      \begin{minipage}[t]{0.48\linewidth}
+        \textbf{Preço Base (R\$):} {\color{red}*}\\
+        \fboxsep=3pt\fcolorbox{gray!30}{white}{\makebox[0.92\linewidth][l]{\color{gray!70}\quad 0.00}}
+      \end{minipage}
+      \hfill
+      \begin{minipage}[t]{0.48\linewidth}
+        \textbf{WhatsApp / Telefone:} {\color{red}*}\\
+        \fboxsep=3pt\fcolorbox{gray!30}{white}{\makebox[0.92\linewidth][l]{\color{gray!70}\quad 48999998888}}
+      \end{minipage}
+      
+      \vspace{4pt}
+      \textbf{Descrição do Serviço:} {\color{red}*}\\
+      \fboxsep=3pt\fcolorbox{gray!30}{white}{\makebox[0.96\linewidth][l]{\rule{0pt}{1.1em}\color{gray!70}\quad Pães artesanais, lanches e cafés...}}
+      
+      \vspace{4pt}
+      \textit{\tiny\color{gray!80} Campo Oculto de Controle: \texttt{<input type="hidden" id="servicoId">} (não visível, gerencia Create vs Update)}
+      
+      \par\vspace{3pt}\textcolor{gray!30}{\hrulefill}\vspace{4pt}
+      % Rodape do Modal
+      \hfill
+      \colorbox{gray!20}{\scriptsize Cancelar}
+      \hspace{4pt}
+      \colorbox{ifscGreen}{\color{white}\scriptsize\bfseries Salvar na Vitrine}
+    \end{tcolorbox}
+  \end{tcolorbox}
+\end{mockupNavegador}
+
+\begin{boxCodigoHTML}
+<!-- index.html (Inserir logo após </main> e imediatamente antes de <script>) -->
+<!-- ====================================================================== -->
+<!-- PARTE 2: MODAL DE CADASTRO E EDIÇÃO (Não apaga a Parte 1!)             -->
+<!-- ====================================================================== -->
+<div class="modal fade" id="modalCadastro" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title font-outfit fw-bold text-dark" id="modalCadastroLabel">
+          <i class="bi bi-shop text-success me-2"></i>Cadastrar Serviço na Vitrine
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Fechar"></button>
+      </div>
+      <form id="formCadastro" novalidate>
+        <input type="hidden" id="servicoId" value="">
+        <div class="modal-body pt-3">
+          <p class="text-muted small mb-3">Preencha as informações do empreendedor local:</p>
+
+          <div class="mb-3">
+            <label for="nome" class="form-label small fw-bold text-muted">
+              Nome do Empreendimento *
+            </label>
+            <input type="text" id="nome" class="form-control rounded-3" required
+                   placeholder="Ex: Maré Alta Artesanatos">
+            <div class="invalid-feedback">Por favor, informe o nome do empreendimento.</div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label for="categoria" class="form-label small fw-bold text-muted">Categoria *</label>
+              <select id="categoria" class="form-select rounded-3" required>
+                <option value="" selected disabled>Selecione...</option>
+                <option value="Alimentação">Alimentação &amp; Gastronomia</option>
+                <option value="Tecnologia">Tecnologia &amp; Internet</option>
+                <option value="Artesanato">Artesanato &amp; Arte Local</option>
+                <option value="Serviços Gerais">Serviços Gerais &amp; Reformas</option>
+                <option value="Turismo">Turismo &amp; Passeios</option>
+              </select>
+              <div class="invalid-feedback">Selecione uma categoria.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="bairro" class="form-label small fw-bold text-muted">
+                Bairro / Localidade *
+              </label>
+              <input type="text" id="bairro" class="form-control rounded-3" required
+                     placeholder="Ex: Ferrugem, Centro...">
+              <div class="invalid-feedback">Informe o bairro em Garopaba.</div>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label for="precoBase" class="form-label small fw-bold text-muted">
+                Preço Base (R$) *
+              </label>
+              <input type="number" id="precoBase" class="form-control rounded-3" required
+                     step="0.01" min="0" placeholder="Ex: 50.00">
+              <div class="invalid-feedback">Informe um valor válido em R$.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="telefone" class="form-label small fw-bold text-muted">
+                WhatsApp / Telefone *
+              </label>
+              <input type="tel" id="telefone" class="form-control rounded-3" required
+                     pattern="[0-9]{10,11}" placeholder="48999998888">
+              <div class="invalid-feedback">Informe com DDD (10 ou 11 dígitos).</div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="descricao" class="form-label small fw-bold text-muted">
+              Descrição dos Serviços e Produtos *
+            </label>
+            <textarea id="descricao" class="form-control rounded-3" rows="3" required
+                      placeholder="Descreva os produtos e diferenciais..."></textarea>
+            <div class="invalid-feedback">Insira uma breve descrição sobre o negócio.</div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" data-bs-dismiss="modal"
+                  class="btn btn-light rounded-pill px-4 text-muted fw-bold">Cancelar</button>
+          <button type="submit" id="btnSalvarModal"
+                  class="btn btn-success rounded-pill px-4 font-outfit fw-bold shadow-sm">
+            <i class="bi bi-check2-circle me-1"></i>
+            <span id="btnSalvarTexto">Salvar na Vitrine</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+\end{boxCodigoHTML}
+
+\begin{boxTeste}[{Checkpoint de Validação 1.2: Como Testar a Abertura do Modal}]
+Atualize o navegador e clique no botão amarelo \textbf{"Divulgar Serviço"}:
+\begin{enumerate}[leftmargin=*, nosep]
+  \item O modal deve abrir de forma suave, centralizada e com bordas arredondadas (\texttt{.rounded-4});
+  \item Verifique se todos os campos estão bem espaçados no corpo do modal;
+  \item Clique em \textbf{"Cancelar"} ou no botão \textbf{"X"} para confirmar o fechamento nativo.
+\end{enumerate}
+\end{boxTeste}
+
+\begin{boxAtividade}[{Fase 1.3/5: Estilização Complementar (styles.css)}]
+\textbf{Responsabilidade Arquitetural:} Definir variáveis de cores institucionais do IFSC Garopaba, aplicar tipografia Google Fonts (\textit{Outfit} e \textit{Plus Jakarta Sans}), o gradiente no cabeçalho e a elevação suave nos cards (\texttt{transform: translateY(-5px)}).
+\end{boxAtividade}
+
+\begin{boxCodigoHTML}
+/* styles.css */
+:root {
+  --ifsc-green: #059669;
+  --ifsc-dark-green: #047857;
+  --garopaba-blue: #0284c7;
+  --bg-page: #f8fafc;
+  --text-dark: #0f172a;
+}
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-dark);
+}
+.font-outfit { font-family: 'Outfit', sans-serif; }
+.hero-banner {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+  color: #ffffff;
+  padding: 2.5rem 0 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid #10b981;
+}
+.vitrine-card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+}
+.vitrine-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px -10px rgba(0,0,0,0.12) !important;
+}
+.badge-counter {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 0.4rem 0.9rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+\end{boxCodigoHTML}
+
+\begin{boxTeste}[{Checkpoint de Validação 1.3: Como Testar a Estilização}]
+Salve \texttt{styles.css} na mesma pasta do \texttt{index.html} e atualize a página:
+\begin{enumerate}[leftmargin=*, nosep]
+  \item O banner superior exibe o \textbf{degradê verde} com tipografia branca;
+  \item O contador surge como uma pílula translúcida ao lado de \textbf{"Divulgar Serviço"};
+  \item No Console (F12), o erro 404 de \texttt{styles.css} desaparece (o de \texttt{js/main.js} segue até o Passo 5).
+\end{enumerate}
+\end{boxTeste}
+
+\clearpage
+\begin{boxAtividade}[{Fase 2/5: Utilitários Puros (js/utils/formatters.js)}]
+\textbf{Responsabilidade Arquitetural:} Funções puras e reutilizáveis de transformação de dados. Recebem entradas brutas e retornam formatos amigáveis para o usuário brasileiro (moeda e telefone), além de realizar a sanitização de strings contra ataques XSS (\textit{Cross-Site Scripting}). Não tocam no DOM nem no armazenamento.
+\end{boxAtividade}
+
+\vspace{-0.1cm}
+\begin{boxCroqui}[{Croqui Visual 2: Fluxo Puro de Entrada e Saida}]
+[ "48999998888" ] --------> [ formatarTelefone() ] --------> "(48) 99999-8888"
+[ 35.5          ] --------> [ formatarMoeda()    ] --------> "R$ 35,50"
+[ "<script>..." ] --------> [ escapeHtml()       ] --------> "&lt;script&gt;..."
+\end{boxCroqui}
+
+\begin{boxCodigoJS}
+// js/utils/formatters.js
+export function formatarMoeda(valor) {
+  const num = parseFloat(valor) || 0;
+  return num.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
+}
+
+export function formatarTelefone(fone) {
+  const digits = (fone || '').replace(/\D/g, '');
+  if (digits.length === 11) {
+    return digits.replace(
+      /^(\d{2})(\d{5})(\d{4})/,
+      '($1) $2-$3'
+    );
+  }
+  return fone;
+}
+
+export function escapeHtml(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+\end{boxCodigoJS}
+
+\begin{boxTeste}[{Checkpoint de Validação 2: Teste via Console do Navegador (F12)}]
+No Console do navegador (\textbf{F12}), execute:
+\begin{boxCodigoJS}
+import('./js/utils/formatters.js').then(m => console.log(m.formatarMoeda(149.9)));
+\end{boxCodigoJS}
+\textbf{Resultado esperado:} \texttt{"R\$ 149,90"}. Comprova a exportação nomeada e a formatação nativa!
+\end{boxTeste}
+
+\clearpage
+\begin{boxAtividade}[{Fase 3/5: Camada de Serviços e Dados (js/services/vitrineService.js)}]
+\textbf{Responsabilidade Arquitetural:} Isolar completamente a regra de persistência e ciclo de vida do CRUD (\textit{Create, Read, Update, Delete}). Opera estritamente sobre a chave \texttt{'garopaba\_vitrine\_servicos'} do \texttt{localStorage} do navegador, sem gerar nenhuma tag HTML nem manipular o DOM.
+\end{boxAtividade}
+
+\vspace{-0.1cm}
+\begin{boxCroqui}[{Croqui Visual 3: Arquitetura da Camada de Servicos e Carga Inicial}]
+[ DADOS_INICIAIS ] ---> [ carregarDadosIniciais() ] ---> [ LocalStorage ]
+                                                                |
+[ Interface / main.js ] <--(obterServicos, salvar, atualizar)---+
+\end{boxCroqui}
+
+\begin{boxCodigoJS}
+// js/services/vitrineService.js
+const STORAGE_KEY = 'garopaba_vitrine_servicos';
+
+// Dados modelo semente para enriquecer a experiência inicial
+export const DADOS_INICIAIS = [
+  {
+    id: '1',
+    nome: 'Maré Alta Artesanatos & Cerâmicas',
+    categoria: 'Artesanato',
+    bairro: 'Centro Histórico',
+    precoBase: 35.00,
+    telefone: '48991234567',
+    descricao: 'Peças artesanais e utilitárias modeladas à mão ' +
+      'com argila local e conchas de Garopaba.'
+  },
+  {
+    id: '2',
+    nome: 'Garopaba Web & Design Studio',
+    categoria: 'Tecnologia',
+    bairro: 'Ferrugem',
+    precoBase: 150.00,
+    telefone: '48998765432',
+    descricao: 'Criação de websites profissionais responsivos, ' +
+      'cardápios digitais e suporte para comércio local.'
+  },
+  {
+    id: '3',
+    nome: 'Pescado Fresco do Zequinha',
+    categoria: 'Alimentação',
+    bairro: 'Canto das Canoas',
+    precoBase: 42.00,
+    telefone: '48984561234',
+    descricao: 'Peixes frescos e frutos do mar da pesca artesanal ' +
+      'diária entregues com higiene e pontualidade.'
+  }
+];
+
+// Função dedicada para carregar os dados modelo no LocalStorage
+export function carregarDadosIniciais() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DADOS_INICIAIS));
+  return DADOS_INICIAIS;
+}
+
+// READ: Recupera os serviços ou carrega os dados modelo se vazio
+export function obterServicos() {
+  const dados = localStorage.getItem(STORAGE_KEY);
+  if (!dados) {
+    return carregarDadosIniciais();
+  }
+  try {
+    return JSON.parse(dados);
+  } catch (e) {
+    console.error('Erro ao processar dados da vitrine:', e);
+    return [];
+  }
+}
+
+export function salvarServico(novo) {
+  const servicos = obterServicos();
+  const completo = {
+    id: Date.now().toString(),
+    dataCadastro: new Date().toISOString(),
+    ...novo
+  };
+  servicos.unshift(completo);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(servicos));
+  return completo;
+}
+
+export function atualizarServico(id, dados) {
+  const servicos = obterServicos();
+  const idx = servicos.findIndex(s => s.id === id);
+  if (idx !== -1) {
+    servicos[idx] = { ...servicos[idx], ...dados,
+                      dataEdicao: new Date().toISOString() };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(servicos));
+    return servicos[idx];
+  }
+  return null;
+}
+
+export function removerServico(id) {
+  const servicos = obterServicos().filter(s => s.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(servicos));
+  return servicos;
+}
+\end{boxCodigoJS}
+
+\vspace{-0.25cm}
+\begin{boxTeste}[{Checkpoint de Validação 3: Teste de Persistência no Console (F12)}]
+No Console (\textbf{F12}), teste a carga e a persistência dos dados:
+\begin{boxCodigoJS}
+import('./js/services/vitrineService.js').then(s => {
+  s.carregarDadosIniciais();
+  console.log('Dados salvos:', s.obterServicos());
+});
+\end{boxCodigoJS}
+\textbf{Resultado esperado:} Array com os 3 serviços salvo em \texttt{garopaba\_vitrine\_servicos} (verifique também na aba \textbf{Application $\rightarrow$ Local Storage}).
+\end{boxTeste}
+
+\clearpage
+\begin{boxAtividade}[{Fase 4/5: Camada de Visão (js/views/vitrineView.js)}]
+\textbf{Responsabilidade Arquitetural:} Construir e manipular os elementos visuais na interface. Transforma objetos de dados em cards HTML (\texttt{criarCardHtml}), renderiza coleções no contêiner (\texttt{renderizarCards}) e dispara notificações flutuantes (\texttt{exibirToast}).
+\end{boxAtividade}
+
+\vspace{-0.3cm}
+\begin{center}
+\vspace{-0.2cm}
+\begin{tcolorbox}[enhanced, width=0.88\linewidth, colback=white, colframe=gray!30, arc=5pt, boxrule=0.8pt, shadow={1.5mm}{-1.5mm}{0mm}{black!12}, top=3pt, bottom=3pt, left=10pt, right=10pt]
+  % Topo do Card com Badge e Preco
+  \colorbox{blue!12}{\color{blue!80!black}\footnotesize\bfseries Alimentação}
+  \hfill
+  {\large\bfseries\color{ifscGreen} R\$ 25,00}
+  
+  \vspace{1pt}
+  {\large\bfseries Padaria Central da Ferrugem}
+  
+  \vspace{1pt}
+  {\footnotesize\color{gray!80} \textbf{Bairro:} Ferrugem \quad \textbar \quad \textbf{ID:} \texttt{1729482103}}
+  
+  \vspace{1pt}
+  {\small\color{gray!90} Pães de fermentação natural, café orgânico especial e tortas artesanais com entrega local.}
+  
+  \par\vspace{2pt}\textcolor{gray!25}{\hrulefill}\vspace{2pt}
+  % Acoes do Card
+  \colorbox{ifscGreen}{\color{white}\footnotesize\bfseries WhatsApp: (48) 99999-8888}
+  \hfill
+  \colorbox{orange!15}{\color{orange!85!black}\footnotesize\bfseries Editar}
+  \hspace{3pt}
+  \colorbox{red!15}{\color{red!80!black}\footnotesize\bfseries Excluir}
+\end{tcolorbox}
+\vspace{-0.2cm}
+\end{center}
+\vspace{-0.35cm}
+
+\begin{boxCodigoJS}
+// js/views/vitrineView.js
+import { formatarMoeda, formatarTelefone, escapeHtml }
+  from '../utils/formatters.js';
+
+// Mapeamento de cores para categorias
+const CORES_CATEGORIA = {
+  'Alimentação': 'success',
+  'Tecnologia': 'info',
+  'Artesanato': 'warning',
+  'Serviços Gerais': 'primary',
+  'Turismo': 'secondary'
+};
+
+// Função para criar o HTML de um card de serviço
+export function criarCardHtml(s) {
+  const corBadge = CORES_CATEGORIA[s.categoria] || 'primary';
+  const telNumeros = (s.telefone || '').replace(/\D/g, '');
+  return `
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm border-0 vitrine-card rounded-4 overflow-hidden">
+        <div class="card-body p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-${corBadge} px-3 py-2 rounded-pill font-outfit">
+              <i class="bi bi-tag-fill me-1"></i>${escapeHtml(s.categoria)}
+            </span>
+            <span class="fw-bold text-success font-outfit fs-5">
+              ${formatarMoeda(s.precoBase)}
+            </span>
+          </div>
+          <h5 class="card-title fw-bold text-dark mt-2 mb-1">${escapeHtml(s.nome)}</h5>
+          <h6 class="text-muted small mb-3">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>${escapeHtml(s.bairro)}
+          </h6>
+          <p class="card-text text-secondary small flex-grow-1" style="line-height: 1.5;">
+            ${escapeHtml(s.descricao)}
+          </p>
+          <hr class="my-3 text-muted opacity-25">
+          <div class="d-flex justify-content-between align-items-center mt-auto">
+            <a href="https://wa.me/55${telNumeros}" target="_blank"
+               class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold">
+              <i class="bi bi-whatsapp me-1"></i>${formatarTelefone(s.telefone)}
+            </a>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-outline-primary btn-editar rounded-pill px-2"
+                      data-id="${s.id}" title="Editar serviço">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger btn-excluir rounded-pill px-2"
+                      data-id="${s.id}" title="Remover da vitrine">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// Renderização dinâmica dos cards e tratamento de estado vazio
+export function renderizarCards(servicos, containerElement) {
+  if (!servicos || servicos.length === 0) {
+    containerElement.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <div class="p-4 rounded-4 bg-light border">
+          <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+          <h5 class="fw-bold text-secondary mb-1">Nenhum serviço cadastrado nesta categoria</h5>
+          <p class="text-muted small mb-0">Cadastre um novo serviço ou altere o filtro acima.</p>
+        </div>
+      </div>`;
+    return;
+  }
+  containerElement.innerHTML = servicos.map(criarCardHtml).join('');
+}
+
+// Notificações flutuantes assíncronas (Toasts) com auto-fechamento
+export function exibirToast(mensagem, tipo = 'success') {
+  const toastEl = document.getElementById('toastNotificacao');
+  const toastMsg = document.getElementById('toastMensagem');
+  const toastTitulo = document.getElementById('toastTitulo');
+
+  if (toastEl && toastMsg) {
+    toastMsg.innerText = mensagem;
+    if (toastTitulo) {
+      toastTitulo.innerText = tipo === 'success' ? 'Sucesso!' : 'Aviso';
+    }
+    toastEl.className = `toast align-items-center text-bg-${tipo} border-0 shadow-lg`;
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000 });
+    toast.show();
+  }
+}
+\end{boxCodigoJS}
+
+\vspace{-0.25cm}
+\begin{boxTeste}[{Checkpoint de Validação 4: Teste do Toast no Console (F12)}]
+No Console (\textbf{F12}), teste a notificação flutuante:
+\begin{boxCodigoJS}
+import('./js/views/vitrineView.js').then(v => v.exibirToast('Notificação funcionando!'));
+\end{boxCodigoJS}
+\textbf{Resultado esperado:} O Toast verde surge no canto superior direito da tela.
+\end{boxTeste}
+
+\clearpage
+\begin{boxAtividade}[{Fase 5/5: Orquestrador Central (js/main.js)}]
+\textbf{Responsabilidade Arquitetural:} O controlador principal da aplicação. Importa os serviços e as visões, escuta o carregamento do DOM, conecta os eventos de submissão do formulário (\textit{Create \& Update}), a delegação de cliques nos cards (\textit{Edit \& Delete}) e a reatividade instantânea dos filtros.
+\end{boxAtividade}
+
+\vspace{-0.1cm}
+\begin{boxCroqui}[{Croqui Visual 5: Ciclo de Vida da Orquestracao}]
+Usuario clica/submete ---> main.js valida ---> vitrineService (localStorage)
+                                                      |
+Interface renderiza cards <--- vitrineView <----------+ (atualizarInterface)
+\end{boxCroqui}
+
+\begin{boxCodigoJS}
+// js/main.js
+import {
+  obterServicos, salvarServico,
+  atualizarServico, removerServico
+} from './services/vitrineService.js';
+import {
+  renderizarCards, exibirToast
+} from './views/vitrineView.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('formCadastro');
+  const container = document.getElementById('vitrineContainer');
+  const filtroCategoria = document.getElementById('filtroCategoria');
+  const contadorEl = document.getElementById('totalServicosBadge');
+  const modalEl = document.getElementById('modalCadastro');
+  const servicoIdInput = document.getElementById('servicoId');
+
+  function atualizarInterface() {
+    const todos = obterServicos();
+    const filtro = filtroCategoria.value;
+    const filtrados = filtro === 'todas'
+      ? todos
+      : todos.filter(s => s.categoria === filtro);
+    renderizarCards(filtrados, container);
+    if (contadorEl) {
+      contadorEl.innerText = `${todos.length} Serviços Cadastrados`;
+    }
+  }
+
+  // Filtros Reativos
+  filtroCategoria.addEventListener('change', atualizarInterface);
+  atualizarInterface();
+
+  // Reset do Modal ao abrir para novo cadastro
+  if (modalEl) {
+    modalEl.addEventListener('show.bs.modal', () => {
+      if (!servicoIdInput.value) {
+        form.reset();
+        form.classList.remove('was-validated');
+        const modalTitulo = document.getElementById('modalCadastroLabel');
+        if (modalTitulo) {
+          modalTitulo.innerHTML =
+            '<i class="bi bi-shop text-success me-2"></i>Cadastrar Serviço na Vitrine';
+        }
+        const btnSalvarTexto = document.getElementById('btnSalvarTexto');
+        if (btnSalvarTexto) {
+          btnSalvarTexto.innerText = 'Salvar na Vitrine';
+        }
+      }
+    });
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      form.reset();
+      servicoIdInput.value = '';
+      form.classList.remove('was-validated');
+    });
+  }
+
+  // Submissão do Formulário (Create & Update)
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      e.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+
+    const idAtual = servicoIdInput ? servicoIdInput.value : '';
+    const getVal = (id) => document.getElementById(id).value.trim();
+
+    const dados = {
+      nome: getVal('nome'),
+      categoria: document.getElementById('categoria').value,
+      bairro: getVal('bairro'),
+      precoBase: parseFloat(getVal('precoBase')) || 0,
+      telefone: getVal('telefone'),
+      descricao: getVal('descricao')
+    };
+
+    if (idAtual) {
+      atualizarServico(idAtual, dados);
+      exibirToast('Serviço atualizado com sucesso!');
+    } else {
+      salvarServico(dados);
+      exibirToast('Empreendimento cadastrado com sucesso!');
+    }
+
+    form.reset();
+    if (servicoIdInput) servicoIdInput.value = '';
+    form.classList.remove('was-validated');
+
+    if (modalEl) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.hide();
+    }
+    atualizarInterface();
+  });
+
+  // Delegação de Cliques nos Cards (Edit & Delete)
+  container.addEventListener('click', (e) => {
+    const btnEditar = e.target.closest('.btn-editar');
+    if (btnEditar) {
+      const id = btnEditar.getAttribute('data-id');
+      const item = obterServicos().find(s => s.id === id);
+      if (item) {
+        if (servicoIdInput) servicoIdInput.value = item.id;
+        document.getElementById('nome').value = item.nome;
+        document.getElementById('categoria').value = item.categoria;
+        document.getElementById('bairro').value = item.bairro;
+        document.getElementById('precoBase').value = item.precoBase;
+        document.getElementById('telefone').value = item.telefone;
+        document.getElementById('descricao').value = item.descricao;
+
+        const modalTitulo = document.getElementById('modalCadastroLabel');
+        if (modalTitulo) {
+          modalTitulo.innerHTML =
+            '<i class="bi bi-pencil-square text-primary me-2"></i>Editar Serviço na Vitrine';
+        }
+        const btnSalvarTexto = document.getElementById('btnSalvarTexto');
+        if (btnSalvarTexto) {
+          btnSalvarTexto.innerText = 'Salvar Alterações';
+        }
+
+        if (modalEl) {
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          modal.show();
+        }
+      }
+      return;
+    }
+
+    const btnExcluir = e.target.closest('.btn-excluir');
+    if (btnExcluir) {
+      const id = btnExcluir.getAttribute('data-id');
+      if (confirm('Deseja realmente remover este serviço da vitrine?')) {
+        removerServico(id);
+        atualizarInterface();
+        exibirToast('Serviço removido da vitrine.', 'warning');
+      }
+    }
+  });
+});
+\end{boxCodigoJS}
+
+\vspace{-0.15cm}
+\begin{boxTeste}[{Checkpoint de Validação 5: Teste Completo da Aplicação Ponta a Ponta}]
+Aplicação 100\% integrada! Execute o fluxo completo no navegador:
+\begin{enumerate}[leftmargin=*, nosep]
+  \item \textbf{Validação:} Clique em "Divulgar" e salve vazio. Os campos ficam vermelhos e nada é salvo;
+  \item \textbf{Create:} Preencha e salve. O card surge na vitrine e o contador soma +1 (sob o Toast);
+  \item \textbf{Filter:} Mude a categoria no select. Apenas serviços da categoria escolhida permanecem;
+  \item \textbf{Update:} Clique no lápis em um card, altere os dados no modal e salve;
+  \item \textbf{Delete:} Clique na lixeira, confirme o aviso e veja o item ser removido imediatamente.
+\end{enumerate}
+\end{boxTeste}
+
+% =====================================================
+% CHECKLIST DE ENTREGA DO ESTUDANTE
+% =====================================================
+
+\clearpage
+\subsection{Checklist de Conclusão e Critérios Avaliativos}
+
+Antes de realizar o commit final no repositório, certifique-se de validar todos os itens:
+
+\begin{itemize}
+\item[$\Box$] O projeto utiliza estritamente o padrão ES6 Modules com a tag:\\ \texttt{<script type="module" src="js/main.js"></script>};
+\item[$\Box$] A estrutura em pastas (\texttt{js/services/}, \texttt{js/views/}, \texttt{js/utils/}) foi rigorosamente respeitada;
+\item[$\Box$] O arquivo \texttt{vitrineService.js} opera puramente sobre o \texttt{localStorage} sem manipular elementos do DOM;
+\item[$\Box$] As quatro operações do CRUD (\textbf{Create, Read, Update e Delete}) foram implementadas e testadas com persistência no navegador;
+\item[$\Box$] O formulário exibe validações visuais nativas do Bootstrap 5 (\texttt{.was-validated} e \texttt{.invalid-feedback}) quando campos obrigatórios não são preenchidos;
+\item[$\Box$] A vitrine reage instantaneamente aos filtros de categoria sem recarregar a página;
+\item[$\Box$] O código está devidamente publicado e em pleno funcionamento no \textbf{GitHub Pages}.
+\end{itemize}

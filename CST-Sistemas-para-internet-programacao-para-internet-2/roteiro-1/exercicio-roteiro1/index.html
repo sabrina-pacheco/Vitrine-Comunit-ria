@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercício de Retomada — Bootstrap 5 + jQuery (ProgWeb 2)</title>
+  <!-- Bootstrap 5 CSS (Exemplos 1 a 4) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    .ifsc-badge {
+      background-color: #16a34a;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .card-custom {
+      background-color: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    .table-dark-custom {
+      --bs-table-bg: #1e293b;
+      --bs-table-border-color: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body class="py-4">
+
+  <!-- Exemplo 1: Grid Responsivo & Containers -->
+  <div class="container max-width-lg">
+
+    <!-- Header Institucional com Bootstrap Card (Exemplo 3) -->
+    <header class="card card-custom p-4 mb-4 border-start border-success border-5">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge ifsc-badge fs-5 px-3 py-2">IFSC</span>
+          <div>
+            <h1 class="h4 mb-0 fw-bold">Programação para a Internet 2 (ProgWeb 2)</h1>
+            <p class="text-secondary small mb-0">CST em Sistemas para a Internet — Câmpus Garopaba</p>
+          </div>
+        </div>
+        <div>
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+            <i class="bi bi-code-slash me-1"></i> Aula 01: Bootstrap 5 + jQuery + LocalStorage
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Formulário de Cadastro com Bootstrap Grid & Forms (Exemplo 2) -->
+    <section class="card card-custom p-4 mb-4">
+      <h2 class="h5 fw-bold mb-1">
+        <i class="bi bi-person-plus-fill text-success me-2"></i>Cadastro de Cliente (Prática de Bootstrap 5 e jQuery)
+      </h2>
+      <p class="text-secondary small mb-4">
+        Preencha os campos abaixo. A página utiliza Bootstrap 5 para estilo visual e jQuery para manipulação do DOM e LocalStorage!
+      </p>
+
+      <form id="form-cliente" novalidate>
+        <!-- Exemplo 1: Uso da linha (row) e colunas (col-md) -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-5">
+            <label for="nome" class="form-label fw-semibold">Nome Completo *</label>
+            <input type="text" class="form-control" id="nome" required placeholder="Ex.: Ana Silva">
+          </div>
+          <div class="col-md-4">
+            <label for="email" class="form-label fw-semibold">E-mail *</label>
+            <input type="email" class="form-control" id="email" required placeholder="Ex.: ana@exemplo.com">
+          </div>
+          <div class="col-md-3">
+            <label for="cidade" class="form-label fw-semibold">Cidade / UF *</label>
+            <input type="text" class="form-control" id="cidade" required placeholder="Ex.: Garopaba / SC">
+          </div>
+        </div>
+
+        <!-- Alerta de Mensagem do Bootstrap (Exemplo 3 e 6) -->
+        <div id="mensagem-status" class="alert d-none mb-3" role="alert"></div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-success fw-semibold px-4">
+            <i class="bi bi-check-circle-fill me-1"></i> Cadastrar Cliente
+          </button>
+          <button type="reset" id="btn-limpar" class="btn btn-outline-secondary px-3">
+            <i class="bi bi-eraser-fill me-1"></i> Limpar Form
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tabela com Bootstrap Table & Card (Exemplo 4) -->
+    <section class="card card-custom p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 class="h5 fw-bold mb-0">
+          <i class="bi bi-people-fill text-primary me-2"></i>Clientes Cadastrados (Persistência no LocalStorage)
+        </h2>
+        <div class="d-flex gap-2 align-items-center">
+          <!-- Desafio Extra: Filtro por nome com jQuery (Exemplo 7) -->
+          <div class="input-group input-group-sm" style="max-width: 250px;">
+            <span class="input-group-text"><i class="bi bi-funnel"></i></span>
+            <input type="text" id="filtro-nome" class="form-control" placeholder="Filtrar por nome...">
+          </div>
+          <button id="btn-limpar-todos" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-trash-fill me-1"></i> Limpar Todos
+          </button>
+        </div>
+      </div>
+
+      <!-- Exemplo 4: Tabela com Bootstrap -->
+      <div class="table-responsive">
+        <table class="table table-hover table-dark-custom align-middle mb-0">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nome</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Cidade / UF</th>
+              <th scope="col" class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-body">
+            <!-- Linhas geradas dinamicamente via jQuery (Exemplo 7) -->
+          </tbody>
+        </table>
+
+        <div id="empty-state" class="text-center py-5 text-secondary">
+          <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+          Nenhum cliente cadastrado ainda. Preencha o formulário acima!
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Scripts: jQuery 3.7 + Bootstrap 5 JS + Nosso App -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

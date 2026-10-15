@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retomada & Transição — ProgWeb 1 para ProgWeb 2 (IFSC)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --ifsc-green: #16a34a;
+      --ifsc-green-dark: #15803d;
+      --ifsc-red: #dc2626;
+      --bg-dark: #0f141d;
+      --bg-card: #182030;
+      --bg-card-hover: #222c40;
+      --text-main: #f8fafc;
+      --text-muted: #a8a29e;
+      --border-color: rgba(249, 115, 22, 0.25);
+      --accent-blue: #38bdf8;
+      --accent-purple: #c084fc;
+      --accent-amber: #f97316;
+      --accent-orange: #f97316;
+      --accent-orange-dark: #ea580c;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .deck-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Fixo */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(19, 27, 46, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .brand img {
+      height: 42px;
+      background: #ffffff;
+      padding: 4px 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      object-fit: contain;
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .brand-text p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .badge {
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge-green {
+      background: rgba(22, 163, 74, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(22, 163, 74, 0.4);
+    }
+
+    .badge-blue {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
+    /* Estutura dos Slides */
+    .slide-stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 1.6rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(40px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .slide-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 800;
+      margin-bottom: 0.15rem;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .slide-subtitle {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 1.1rem;
+      max-width: 980px;
+      line-height: 1.45;
+    }
+
+    /* Grids & Cards Layout */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      flex: 1;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.1rem;
+      flex: 1;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      color: #fff;
+    }
+
+    .card p {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .example-desc {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid var(--accent-blue);
+      padding: 0.55rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+      margin-bottom: 0.6rem;
+      line-height: 1.4;
+    }
+
+    .example-tag {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      width: fit-content;
+    }
+
+    .card-highlight { border-left: 4px solid var(--ifsc-green); }
+    .card-highlight-blue { border-left: 4px solid var(--accent-blue); }
+    .card-highlight-purple { border-left: 4px solid var(--accent-purple); }
+    .card-highlight-amber { border-left: 4px solid var(--accent-amber); }
+
+    .link-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 0.8rem;
+      margin-top: 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .link-box a {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .link-box a:hover { text-decoration: underline; }
+
+    /* Custom Table for "Para explorar mais..." */
+    .explore-box {
+      background: rgba(11, 16, 29, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 0.9rem;
+      margin-top: 0.6rem;
+    }
+
+    .explore-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: var(--accent-amber);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .explore-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .explore-table th {
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+    }
+
+    .explore-table td {
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .explore-table code {
+      font-family: 'Fira Code', monospace;
+      color: var(--accent-blue);
+      font-size: 0.76rem;
+    }
+
+    /* Code Tabs */
+    .code-tabs {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #0b101d;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .tab-buttons {
+      display: flex;
+      background: rgba(15, 23, 42, 0.8);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.1rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover { color: #fff; }
+
+    .tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .tab-content {
+      padding: 1.3rem;
+      flex: 1;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .tab-content.active { display: block; }
+
+    pre code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .card pre {
+      background: #0b101d;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      max-height: 270px;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+    }
+
+    .card pre::-webkit-scrollbar {
+      width: 6px;
+    }
+    .card pre::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 4px;
+    }
+    .card pre::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.4);
+      border-radius: 4px;
+    }
+    .card pre::-webkit-scrollbar-thumb:hover {
+      background: rgba(56, 189, 248, 0.7);
+    }
+
+    .kw { color: #f472b6; font-weight: 600; }
+    .fn { color: #38bdf8; font-weight: 600; }
+    .str { color: #4ade80; }
+    .cm { color: #64748b; font-style: italic; }
+
+    /* Checklist Interativo */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      padding: 0.85rem 1.2rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .check-item:hover { background: rgba(255, 255, 255, 0.06); }
+
+    .check-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .check-item.checked .check-box {
+      background: var(--ifsc-green);
+      border-color: var(--ifsc-green);
+      color: #fff;
+    }
+
+    .check-text { font-size: 0.9rem; font-weight: 500; }
+
+    /* Footer & Controls */
+    .app-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 2.5rem;
+      background: rgba(19, 27, 46, 0.9);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .progress-bar-bg {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ea580c 0%, #f97316 100%);
+      width: 8.33%;
+      transition: width 0.3s ease;
+    }
+
+    .slide-counter {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .nav-controls {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .nav-btn {
+      padding: 0.55rem 1.2rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      border-radius: var(--radius-md);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: rgba(249, 115, 22, 0.25);
+      border-color: #f97316;
+      transform: translateY(-1px);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-fs {
+      padding: 0.55rem;
+      width: 38px;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+
+    <!-- Header Fixo -->
+    <header class="app-header">
+      <div class="brand">
+        <img src="../../figures/garopaba_horizontal_marca2015_PNG.png" alt="IFSC Garopaba">
+        <div class="brand-text">
+          <h1>Programação para a Internet 2 (ProgWeb 2)</h1>
+          <p>CST em Sistemas para a Internet — Parte 2: jQuery &amp; Storage (Laranja &amp; Branco)</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-green">Prof. André Moraes</span>
+        <span class="badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316; border: 1px solid #ea580c;">jQuery (Laranja &amp; Branco)</span>
+      </div>
+    </header>
+
+    <!-- Palco Principal de Slides -->
+    <main class="slide-stage">
+      <!-- SLIDE 1: Capa & Boas-Vindas Parte 2 -->
+      <section class="slide active" id="slide-1">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+          <div style="margin-bottom: 1rem;">
+            <span style="background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); color: #f97316; padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.9rem; font-weight: 700;">
+              <i class="bi bi-lightning-charge-fill me-1"></i> Módulo Parte 2 • jQuery &amp; Programação Dinâmica (Laranja &amp; Branco)
+            </span>
+          </div>
+
+          <h2 class="slide-title" style="font-size: 2.5rem; line-height: 1.15; margin-bottom: 0.8rem;">
+            Retomada Prática de Frontend — Parte 2:<br>
+            <span style="color: #f97316;">Manipulação do DOM &amp; LocalStorage com jQuery</span>
+          </h2>
+
+          <p class="slide-subtitle" style="font-size: 1.1rem; line-height: 1.6; max-width: 850px; margin: 0 auto 1.8rem auto;">
+            Transforme o layout estático criado no Bootstrap 5 em uma <strong>aplicação web 100% interativa</strong>, com captura de eventos, animações fluidas e persistência de dados.
+          </p>
+
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem;">
+            <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.5rem; text-align: left; min-width: 250px;">
+              <div style="color: var(--accent-emerald); font-weight: 700; margin-bottom: 0.3rem;"><i class="bi bi-cursor-fill me-1"></i> Seletores & Eventos</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">Sintaxe $() e escutadores .on('click')</div>
+            </div>
+            <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.5rem; text-align: left; min-width: 250px;">
+              <div style="color: var(--accent-purple); font-weight: 700; margin-bottom: 0.3rem;"><i class="bi bi-magic me-1"></i> Efeitos & DOM</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">fadeIn, slideToggle, append e remove</div>
+            </div>
+            <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.5rem; text-align: left; min-width: 250px;">
+              <div style="color: var(--accent-amber); font-weight: 700; margin-bottom: 0.3rem;"><i class="bi bi-hdd-network-fill me-1"></i> LocalStorage</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">Persistência de Dados no Navegador</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- SLIDE 2: Recapitulação da Parte 1 -->
+      <section class="slide" id="slide-2">
+        <h2 class="slide-title">🔄 Recapitulação: Onde Paramos na Parte 1?</h2>
+        <p class="slide-subtitle">Na Parte 1, construímos toda a estrutura visual responsiva utilizando o Bootstrap 5:</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; margin-top: 1rem;">
+          <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <div style="color: var(--accent-blue); font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="bi bi-check2-square"></i></div>
+            <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem;">Grid Responsivo Montado</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;">Dividimos a tela em colunas adaptáveis para formulários e tabelas em dispositivos móveis e desktops.</p>
+          </div>
+
+          <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <div style="color: var(--accent-emerald); font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="bi bi-eye-fill"></i></div>
+            <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem;">Interface Bonita mas Estática</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;">Os botões e formulários já possuem visual profissional, mas nada acontece ainda ao clicar neles.</p>
+          </div>
+
+          <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <div style="color: var(--accent-amber); font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="bi bi-lightning-fill"></i></div>
+            <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem;">O Papel do jQuery Agora</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;">Adicionar a inteligência no cliente: ler os dados digitados, inserir novas linhas na tabela dinamicamente e salvar tudo no navegador.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2.1: Conceitos do DOM & Interação com JavaScript -->
+      <section class="slide" id="slide-dom">
+        <h2 class="slide-title">🌐 Conceitos Fundamentais: O que é o DOM?</h2>
+        <p class="slide-subtitle">Compreendendo como o navegador representa a página e como o JavaScript/jQuery interage com ela:</p>
+
+        <div class="grid-2" style="grid-template-columns: 1.1fr 0.9fr; gap: 1.2rem; align-items: stretch;">
+          
+          <!-- Coluna 1: Explicação Conceitual Direta -->
+          <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+            
+            <div style="background: rgba(19, 27, 46, 0.85); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-blue); border-radius: 10px; padding: 1rem;">
+              <div style="color: var(--accent-blue); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem;">
+                <i class="bi bi-diagram-3-fill me-1"></i> Significado da Sigla DOM
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin: 0;">
+                <strong>DOM (Document Object Model - Modelo de Objeto do Documento)</strong> é a representação em memória (estrutura em árvore) da página web. Quando o navegador lê o HTML, ele transforma cada tag em um <strong>objeto acessível e manipulável</strong>.
+              </p>
+            </div>
+
+            <div style="background: rgba(19, 27, 46, 0.85); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-emerald); border-radius: 10px; padding: 1rem;">
+              <div style="color: var(--accent-emerald); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem;">
+                <i class="bi bi-gear-wide-connected me-1"></i> Responsabilidades Principais do DOM
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin: 0;">
+                1. <strong>Mapeamento Hierárquico:</strong> Organiza a relação entre elementos pais e filhos (ex: <code>&lt;form&gt;</code> contendo <code>&lt;input&gt;</code>).<br>
+                2. <strong>Interface de Interatividade:</strong> Fornece comandos para ler valores, modificar textos, alterar estilos CSS e escutar eventos (cliques e envios).
+              </p>
+            </div>
+
+            <div style="background: rgba(19, 27, 46, 0.85); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-purple); border-radius: 10px; padding: 1rem;">
+              <div style="color: var(--accent-purple); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem;">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Como o JavaScript / jQuery Interage?
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin: 0;">
+                O código JS consulta a árvore usando seletores como <code>$('#input-nome')</code>. A partir daí, executa <strong>operações dinâmicas</strong>: lê dados (<code>.val()</code>), altera textos (<code>.html()</code>), modifica cores (<code>.css()</code>) e reage a eventos (<code>.on('click')</code>).
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Coluna 2: Ilustração Visual da Árvore do DOM -->
+          <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.1rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem;">
+              <i class="bi bi-tree-fill me-1"></i> Ilustração: Árvore do DOM no Navegador
+            </div>
+
+            <!-- Diagrama Visual em Árvore CSS -->
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; font-family: monospace; font-size: 0.8rem;">
+              
+              <!-- Raiz: Document / Window -->
+              <div style="background: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-blue); color: #93c5fd; padding: 0.35rem 1rem; border-radius: 6px; font-weight: 700;">
+                window . document
+              </div>
+              <div style="color: var(--text-muted); line-height: 1; font-size: 0.75rem;">↓</div>
+
+              <!-- Elemento Raiz HTML -->
+              <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--accent-emerald); color: #6ee7b7; padding: 0.3rem 0.9rem; border-radius: 6px; font-weight: 600;">
+                &lt;html&gt;
+              </div>
+              <div style="color: var(--text-muted); line-height: 1; font-size: 0.75rem;">↓</div>
+
+              <!-- Body -->
+              <div style="background: rgba(168, 85, 247, 0.2); border: 1px solid var(--accent-purple); color: #d8b4fe; padding: 0.3rem 0.9rem; border-radius: 6px; font-weight: 600;">
+                &lt;body&gt;
+              </div>
+
+              <!-- Ramificação para Elementos da Aplicação -->
+              <div style="width: 90%; border-top: 1px dashed var(--border-color); margin: 0.2rem 0;"></div>
+
+              <div style="display: flex; justify-content: space-between; width: 100%; gap: 0.3rem;">
+                
+                <!-- Ramo Form -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.3rem; flex: 1;">
+                  <div style="background: rgba(245, 158, 11, 0.2); border: 1px solid var(--accent-amber); color: #fde047; padding: 0.25rem 0.4rem; border-radius: 5px; font-size: 0.72rem; font-weight: 600; text-align: center;">
+                    &lt;form#form-cadastro&gt;
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.7rem;">↓</div>
+                  <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: #cbd5e1; padding: 0.25rem 0.4rem; border-radius: 4px; font-size: 0.68rem; text-align: center;">
+                    &lt;input#input-nome&gt;<br>
+                    <span style="color: var(--accent-emerald); font-weight: 600;">$().val()</span>
+                  </div>
+                </div>
+
+                <!-- Ramo Mensagem -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.3rem; flex: 1;">
+                  <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--accent-emerald); color: #6ee7b7; padding: 0.25rem 0.4rem; border-radius: 5px; font-size: 0.72rem; font-weight: 600; text-align: center;">
+                    &lt;div#caixa-mensagem&gt;
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.7rem;">↓</div>
+                  <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: #cbd5e1; padding: 0.25rem 0.4rem; border-radius: 4px; font-size: 0.68rem; text-align: center;">
+                    Alerta Visual<br>
+                    <span style="color: var(--accent-blue); font-weight: 600;">$().html() / .css()</span>
+                  </div>
+                </div>
+
+                <!-- Ramo Tabela -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.3rem; flex: 1;">
+                  <div style="background: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-blue); color: #93c5fd; padding: 0.25rem 0.4rem; border-radius: 5px; font-size: 0.72rem; font-weight: 600; text-align: center;">
+                    &lt;tbody#tabela-corpo&gt;
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.7rem;">↓</div>
+                  <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: #cbd5e1; padding: 0.25rem 0.4rem; border-radius: 4px; font-size: 0.68rem; text-align: center;">
+                    Linhas &lt;tr&gt;<br>
+                    <span style="color: var(--accent-purple); font-weight: 600;">$().append()</span>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 2.2: Sintaxe do jQuery & Ciclo de Vida $(document).ready() -->
+      <section class="slide" id="slide-sintaxe-ready">
+        <h2 class="slide-title">⚙️ Sintaxe do jQuery & O Comando $(document).ready()</h2>
+        <p class="slide-subtitle">Como os comandos são estruturados e por que precisamos aguardar a montagem do DOM:</p>
+
+        <div class="grid-2" style="grid-template-columns: 1.1fr 0.9fr; gap: 1.2rem; align-items: stretch;">
+          
+          <!-- Coluna 1: Sintaxe Geral & $(document).ready() -->
+          <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+            
+            <div style="background: rgba(19, 27, 46, 0.85); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-blue); border-radius: 10px; padding: 1rem;">
+              <div style="color: var(--accent-blue); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem;">
+                <i class="bi bi-code-slash me-1"></i> A Sintaxe Básica do jQuery: $(seletor).acao()
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin: 0;">
+                Toda instrução jQuery segue o padrão <code>$(seletor).acao()</code>:
+                <br>• <code>$</code>: Atalho para acessar a biblioteca jQuery.
+                <br>• <code>seletor</code>: String com o seletor CSS do elemento (ex: <code>'#btn-salvar'</code>).
+                <br>• <code>acao()</code>: Método que lê, modifica ou escuta o elemento (ex: <code>.val()</code>, <code>.html()</code>, <code>.on()</code>).
+              </p>
+            </div>
+
+            <div style="background: rgba(19, 27, 46, 0.85); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-emerald); border-radius: 10px; padding: 1rem;">
+              <div style="color: var(--accent-emerald); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem;">
+                <i class="bi bi-shield-check me-1"></i> O que faz o $(document).ready(function() { ... })?
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin: 0;">
+                É o evento de <strong>inicialização segura</strong> da página. Ele garante que qualquer código JS/jQuery dentro dele só seja executado <strong>após o navegador ter terminado de ler todo o HTML e montado a árvore do DOM na memória</strong>.
+              </p>
+            </div>
+
+            <div style="background: rgba(19, 27, 46, 0.85); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-amber); border-radius: 10px; padding: 1rem;">
+              <div style="color: var(--accent-amber); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem;">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> Por que temos que utilizá-lo? (A causa do erro)
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin: 0;">
+                Se o script rodar antes de o HTML ser lido, o elemento (ex: <code>#form-cadastro</code>) ainda <strong>não existirá na memória RAM</strong>. O jQuery retornará um objeto nulo/vazio e os cliques ou eventos falharão silenciosamente!
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Coluna 2: Comparativo e Sintaxe em Código -->
+          <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem;">
+                <i class="bi bi-terminal-fill me-1"></i> Estrutura do Comando na Prática
+              </div>
+
+              <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem; font-family: monospace; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 1rem; line-height: 1.6;">
+                <span style="color: #93c5fd; font-weight: 700;">$(document)</span>.<span style="color: #fde047; font-weight: 700;">ready</span>(<span style="color: #d8b4fe;">function</span>() {<br>
+                &nbsp;&nbsp;<span style="color: #6ee7b7;">// 🟢 O DOM já foi 100% carregado na RAM!</span><br>
+                &nbsp;&nbsp;<span style="color: #6ee7b7;">// Aqui podemos manipular formulários e botões com segurança:</span><br>
+                &nbsp;&nbsp;<span style="color: #93c5fd;">$('#form-cadastro')</span>.<span style="color: #fde047;">on</span>(<span style="color: #fca5a5;">'submit'</span>, <span style="color: #d8b4fe;">function</span>(e) { ... });<br>
+                });
+              </div>
+            </div>
+
+            <!-- Card Comparativo Sem vs Com ready() -->
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 0.7rem; font-size: 0.8rem; color: #fca5a5;">
+                <strong>🛑 Sem $(document).ready():</strong> JS executa antes do HTML $\rightarrow$ <code>$('#btn-salvar')</code> é <code>null</code> $\rightarrow$ Evento de clique não funciona.
+              </div>
+
+              <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 0.7rem; font-size: 0.8rem; color: #6ee7b7;">
+                <strong>🟢 Com $(document).ready():</strong> JS aguarda a montagem do DOM $\rightarrow$ <code>$('#btn-salvar')</code> é localizado com sucesso $\rightarrow$ Aplicação funciona perfeitamente!
+              </div>
+
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.2rem;">
+                💡 <em>Sintaxe Abreviada Equivalente:</em> <code>$(function() { /* código */ });</code>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 2.3: Evolução Incremental & Timeline dos Exemplos -->
+      <section class="slide" id="slide-timeline">
+        <h2 class="slide-title">🚀 Metodologia Incremental: Evolução Passo a Passo</h2>
+        <p class="slide-subtitle">Como uma única estrutura base ganha novos recursos a cada exemplo prático:</p>
+
+        <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+          
+          <!-- Box explicativo curto -->
+          <div style="background: rgba(19, 27, 46, 0.85); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-emerald); border-radius: 10px; padding: 1rem;">
+            <div style="color: var(--accent-emerald); font-weight: 700; font-size: 1rem; margin-bottom: 0.2rem;">
+              <i class="bi bi-layers-half me-1"></i> A Mesma Aplicação Base, Recursos Crescentes!
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin: 0;">
+              Todos os nossos exemplos práticos utilizam a <strong>mesma estrutura HTML do Cadastro de Clientes</strong> (Bootstrap 5). Em vez de recriar páginas do zero, nós <strong>acrescentamos camadas graduais de funcionalidades</strong> sobre o mesmo código JavaScript:
+            </p>
+          </div>
+
+          <!-- Diagrama em Formato de Timeline Horizontal / Grid Conectado -->
+          <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.2rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.2rem; text-align: center;">
+              <i class="bi bi-diagram-2-fill me-1"></i> Timeline de Evolução Pedagógica (Exemplos 6 a 11)
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.8rem; position: relative;">
+              
+              <!-- Etapa 1: Ex 6 -->
+              <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 0.8rem 0.6rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span style="background: var(--accent-blue); color: white; padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">Exemplo 6</span>
+                  <h4 style="color: white; font-size: 0.85rem; font-weight: 700; margin: 0.5rem 0 0.3rem 0;">Base & Leitura</h4>
+                  <p style="color: var(--text-muted); font-size: 0.73rem; line-height: 1.3; margin: 0;">Sintaxe <code>$()</code>, evento <code>submit</code>, leitura com <code>.val()</code> e escrita com <code>.html()</code>.</p>
+                </div>
+                <div style="color: var(--accent-blue); font-size: 1rem; margin-top: 0.5rem;"><i class="bi bi-input-cursor-text"></i></div>
+              </div>
+
+              <!-- Etapa 2: Ex 7 -->
+              <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 0.8rem 0.6rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span style="background: var(--accent-emerald); color: white; padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">Exemplo 7</span>
+                  <h4 style="color: white; font-size: 0.85rem; font-weight: 700; margin: 0.5rem 0 0.3rem 0;">Feedback Animado</h4>
+                  <p style="color: var(--text-muted); font-size: 0.73rem; line-height: 1.3; margin: 0;">Troca de classes Bootstrap e efeito de piscar 2x com <code>.fadeOut().fadeIn()</code>.</p>
+                </div>
+                <div style="color: var(--accent-emerald); font-size: 1rem; margin-top: 0.5rem;"><i class="bi bi-stars"></i></div>
+              </div>
+
+              <!-- Etapa 3: Ex 8 -->
+              <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 0.8rem 0.6rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span style="background: var(--accent-amber); color: white; padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">Exemplo 8</span>
+                  <h4 style="color: white; font-size: 0.85rem; font-weight: 700; margin: 0.5rem 0 0.3rem 0;">Cores Dinâmicas</h4>
+                  <p style="color: var(--text-muted); font-size: 0.73rem; line-height: 1.3; margin: 0;">Modificação direta de propriedades CSS via código com <code>.css({ ... })</code>.</p>
+                </div>
+                <div style="color: var(--accent-amber); font-size: 1rem; margin-top: 0.5rem;"><i class="bi bi-palette-fill"></i></div>
+              </div>
+
+              <!-- Etapa 4: Ex 9 -->
+              <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 0.8rem 0.6rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span style="background: var(--accent-purple); color: white; padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">Exemplo 9</span>
+                  <h4 style="color: white; font-size: 0.85rem; font-weight: 700; margin: 0.5rem 0 0.3rem 0;">Painel Retrátil</h4>
+                  <p style="color: var(--text-muted); font-size: 0.73rem; line-height: 1.3; margin: 0;">Efeitos de deslizar suave com <code>.slideToggle()</code> e <code>.slideDown()</code>.</p>
+                </div>
+                <div style="color: var(--accent-purple); font-size: 1rem; margin-top: 0.5rem;"><i class="bi bi-arrows-collapse"></i></div>
+              </div>
+
+              <!-- Etapa 5: Ex 10 -->
+              <div style="background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 8px; padding: 0.8rem 0.6rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span style="background: #ec4899; color: white; padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">Exemplo 10</span>
+                  <h4 style="color: white; font-size: 0.85rem; font-weight: 700; margin: 0.5rem 0 0.3rem 0;">Tabela Dinâmica</h4>
+                  <p style="color: var(--text-muted); font-size: 0.73rem; line-height: 1.3; margin: 0;">Inserção com <code>.append()</code> e exclusão de linhas com <code>.closest('tr').remove()</code>.</p>
+                </div>
+                <div style="color: #ec4899; font-size: 1rem; margin-top: 0.5rem;"><i class="bi bi-table"></i></div>
+              </div>
+
+              <!-- Etapa 6: Ex 11 -->
+              <div style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 8px; padding: 0.8rem 0.6rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span style="background: #0ea5e9; color: white; padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">Exemplo 11</span>
+                  <h4 style="color: white; font-size: 0.85rem; font-weight: 700; margin: 0.5rem 0 0.3rem 0;">LocalStorage</h4>
+                  <p style="color: var(--text-muted); font-size: 0.73rem; line-height: 1.3; margin: 0;">Persistência permanente no navegador com <code>JSON.stringify()</code> e <code>JSON.parse()</code>.</p>
+                </div>
+                <div style="color: #0ea5e9; font-size: 1rem; margin-top: 0.5rem;"><i class="bi bi-database-fill-check"></i></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+<!-- SLIDE 3: jQuery — Introdução Prática & Primeiros Passos (Exemplo 6) -->
+      <section class="slide" id="slide-3">
+        <h2 class="slide-title">⚡ jQuery: Introdução Prática & Primeiros Passos (Exemplo 6)</h2>
+        <p class="slide-subtitle">A Base HTML Unificada, a Inicialização com <code>$(document).ready()</code> e a Leitura de Campos:</p>
+
+        <div class="grid-2">
+          <div>
+            <div class="card card-highlight-blue mb-3">
+              <span class="example-tag">Exemplo 6 (Passo 1: Leitura & Escrita Básica)</span>
+              <h3>Base HTML Unificada & Seletores $()</h3>
+              <div class="example-desc">
+                <strong>Estrutura Base Inicial:</strong> Criação da página com o formulário <code>#form-cadastro</code>, inputs (<code>#input-nome</code>, <code>#input-email</code>), botão <code>#btn-salvar</code> e div de alerta <code>#caixa-mensagem</code>. Ao submeter, faz a leitura dos campos com <code>.val()</code> e escrita com <code>.html()</code>.
+              </div>
+              <pre style="max-height: 340px; overflow-y: auto;"><code><span class="cm">&lt;!-- 1. Estrutura HTML Base Unificada (Bootstrap 5) --&gt;</span>
+&lt;<span class="kw">form</span> id=<span class="str">"form-cadastro"</span>&gt;
+  &lt;<span class="kw">input</span> type=<span class="str">"text"</span> id=<span class="str">"input-nome"</span> class=<span class="str">"form-control mb-2"</span> placeholder=<span class="str">"Nome"</span>&gt;
+  &lt;<span class="kw">input</span> type=<span class="str">"email"</span> id=<span class="str">"input-email"</span> class=<span class="str">"form-control mb-2"</span> placeholder=<span class="str">"E-mail"</span>&gt;
+  &lt;<span class="kw">button</span> type=<span class="str">"submit"</span> id=<span class="str">"btn-salvar"</span> class=<span class="str">"btn btn-primary"</span>&gt;Salvar&lt;/<span class="kw">button</span>&gt;
+&lt;/<span class="kw">form</span>&gt;
+
+&lt;<span class="kw">div</span> id=<span class="str">"caixa-mensagem"</span> class=<span class="str">"alert alert-info mt-3 d-none"</span>&gt;&lt;/<span class="kw">div</span>&gt;
+
+<span class="cm">&lt;!-- 2. Inclusão do jQuery e Script app.js --&gt;</span>
+&lt;<span class="kw">script</span> src=<span class="str">"https://code.jquery.com/jquery-3.7.1.min.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;
+&lt;<span class="kw">script</span>&gt;
+  $(document).<span class="fn">ready</span>(<span class="kw">function</span>() {
+    $(<span class="str">'#form-cadastro'</span>).<span class="fn">on</span>(<span class="str">'submit'</span>, <span class="kw">function</span>(e) {
+      e.<span class="fn">preventDefault</span>();
+      <span class="kw">const</span> nome = $(<span class="str">'#input-nome'</span>).<span class="fn">val</span>();
+      <span class="kw">const</span> email = $(<span class="str">'#input-email'</span>).<span class="fn">val</span>();
+
+      $(<span class="str">'#caixa-mensagem'</span>).<span class="fn">html</span>(<span class="str">`Lido: &lt;strong&gt;${nome}&lt;/strong&gt; (${email})`</span>);
+    });
+  });
+&lt;/<span class="kw">script</span>&gt;</code></pre>
+            </div>
+          </div>
+
+          <!-- Tabela "Etapas do jQuery" -->
+          <div class="card">
+            <div class="explore-title">🔍 As 3 Etapas Fundamentais para Usar o jQuery:</div>
+            <div class="table-responsive">
+              <table class="explore-table">
+                <thead>
+                  <tr>
+                    <th>Etapa</th>
+                    <th>Comando & Função Pedagógica</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>1. Inclusão CDN</code></td>
+                    <td><code>&lt;script src="jquery.min.js"&gt;</code>: Carrega a biblioteca e cria o atalho global <code>$()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>2. Espera do DOM</code></td>
+                    <td><code>$(document).ready(...)</code>: Garante que os elementos HTML já foram carregados antes de serem acessados.</td>
+                  </tr>
+                  <tr>
+                    <td><code>3. Seletor + Ação</code></td>
+                    <td><code>$('#input-nome').val()</code>: Seleciona pelo ID e executa o método de leitura <code>.val()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>4. Escrita na Tela</code></td>
+                    <td><code>$('#caixa-mensagem').html('...')</code>: Atualiza dinamicamente o texto ou HTML da mensagem.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: jQuery — Recursos Estéticos (Exemplo 7) -->
+      <section class="slide" id="slide-4">
+        <h2 class="slide-title">⚡ jQuery: Recursos Estéticos (Efeitos & Classes CSS)</h2>
+        <p class="slide-subtitle">Incrementando a Base HTML com Animações Fluidas e Feedback Visual:</p>
+
+        <div class="grid-2">
+          <div>
+            <div class="card card-highlight-blue mb-3">
+              <span class="example-tag">Exemplo 7 (Passo 2: Animações & Classes)</span>
+              <h3>Feedback Animado no #caixa-mensagem</h3>
+              <div class="example-desc">
+                <strong>Adicionado em relação ao Exemplo 6:</strong> Aplicação de classes CSS do Bootstrap (<code>.addClass('alert-success')</code>) e <strong>efeito visual de piscar / pulsar duplo</strong> encadeando <code>.fadeOut(150).fadeIn(150)</code> para destacar a mensagem na tela.
+              </div>
+              <pre style="max-height: 340px; overflow-y: auto;"><code>$(document).ready(function() {
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val();
+    const email = $('#input-email').val();
+
+    <span class="cm">// NOVO NO EXEMPLO 7: Troca de classes e animação de piscar 2x</span>
+    $('#caixa-mensagem')
+      .removeClass('d-none alert-info alert-danger')
+      .addClass('alert-success')
+      .html(`🎉 &lt;strong&gt;Sucesso!&lt;/strong&gt; Cliente &lt;u&gt;${nome}&lt;/u&gt; cadastrado!`)
+      .fadeOut(150).fadeIn(150)
+      .fadeOut(150).fadeIn(400);
+  });
+});</code></pre>
+            </div>
+          </div>
+
+          <!-- Tabela "Para explorar mais..." -->
+          <div class="card">
+            <div class="explore-title">🔍 Para explorar mais no jQuery (Efeitos Visuais):</div>
+            <div class="table-responsive">
+              <table class="explore-table">
+                <thead>
+                  <tr>
+                    <th>Método de Efeito</th>
+                    <th>Descrição & Efeito Visual na Mesma Tela</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>$(el).hide() / .show()</code></td>
+                    <td>Oculta ou exibe o elemento instantaneamente na tela.</td>
+                  </tr>
+                  <tr>
+                    <td><code>$(el).slideUp() / .slideDown()</code></td>
+                    <td>Efeito de deslizar para cima (recolher) ou deslizar para baixo (expandir).</td>
+                  </tr>
+                  <tr>
+                    <td><code>$(el).slideToggle()</code></td>
+                    <td>Alterna entre deslizar para cima e para baixo a cada clique.</td>
+                  </tr>
+                  <tr>
+                    <td><code>$(el).toggleClass('d-none')</code></td>
+                    <td>Alterna a presença de uma classe CSS no elemento selecionado.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: jQuery — Estilização Dinâmica com .css() (Exemplo 8) -->
+      <section class="slide" id="slide-5">
+        <h2 class="slide-title">⚡ jQuery: Estilização Dinâmica com .css()</h2>
+        <p class="slide-subtitle">Manipulação Direta de Cores e Estilos CSS via Código (Exemplo 8):</p>
+
+        <div class="card card-highlight-blue mb-3">
+          <span class="example-tag">Exemplo 8 (Troca de Cores com .css())</span>
+          <h3>Estilização Dinâmica na Página</h3>
+          <div class="example-desc">
+            <strong>Adicionado em relação ao Exemplo 7:</strong> Manipulação direta de estilos e cores via código usando <code>$(el).css()</code>, alterando a cor de fundo do formulário e as bordas/texto do <code>#caixa-mensagem</code>.
+          </div>
+          <pre style="max-height: 240px; overflow-y: auto;"><code>$(document).ready(function() {
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    <span class="cm">// NOVO NO EXEMPLO 8: Alterando cores e estilos via .css()</span>
+    $('#form-cadastro').css('background-color', '#eaf5eb');
+    $('#caixa-mensagem')
+      .removeClass('d-none')
+      .css({ 'background-color': '#d1e7dd', 'color': '#0f5132', 'border-color': '#badbcc' })
+      .html(`🎨 &lt;strong&gt;Estilo Aplicado!&lt;/strong&gt; Cliente cadastrado com sucesso.`);
+  });
+});</code></pre>
+        </div>
+
+        <!-- Painel de explicação de recursos adicionais para CSS -->
+        <div class="card mt-2">
+          <div class="explore-title">🔍 Métodos Estéticos & Manipulação de Estilos (Recursos Adicionais):</div>
+          <div class="table-responsive">
+            <table class="explore-table">
+              <thead>
+                <tr>
+                  <th>Método jQuery</th>
+                  <th>Descrição & Uso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>$(el).css('prop', 'valor')</code></td>
+                  <td>Altera uma propriedade CSS individual diretamente.</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).css({ obj })</code></td>
+                  <td>Aplica um objeto com múltiplos estilos CSS simultaneamente.</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).addClass('classe')</code></td>
+                  <td>Adiciona uma ou mais classes CSS ao elemento sem sobrescrever as existentes.</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).removeClass('classe')</code></td>
+                  <td>Remove classes CSS específicas do elemento.</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).toggleClass('classe')</code></td>
+                  <td>Alterna a presença da classe a cada disparo de evento.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5.1: jQuery — Efeitos Visuais & Painéis Retráteis (Exemplo 9) -->
+      <section class="slide" id="slide-5-1">
+        <h2 class="slide-title">⚡ jQuery: Efeitos Visuais & Painéis Retráteis (Exemplo 9)</h2>
+        <p class="slide-subtitle">Deslizamento Suave de Elementos com <code>.slideToggle()</code> e <code>.slideDown()</code>:</p>
+
+        <!-- Código HTML e JS Lado a Lado -->
+        <div class="grid-2 mb-3">
+          <div class="card card-highlight-amber">
+            <span class="example-tag">Exemplo 9 (📌 1. Estrutura HTML Necessária)</span>
+            <h3>Elementos HTML no Documento</h3>
+            <div class="example-desc">
+              Botão e painel retrátil (<code>display: none;</code>) <strong>inseridos no topo da página (logo antes do formulário <code>&lt;form id="form-cadastro"&gt;</code>)</strong>:
+            </div>
+            <pre style="max-height: 280px; overflow-y: auto;"><code><span class="cm">&lt;!-- 📍 POSICIONAMENTO: Inseridos ANTES do &lt;form id="form-cadastro"&gt; (no topo do &lt;body&gt; ou após o título, se houver) --&gt;</span>
+
+<span class="cm">&lt;!-- 1. Botão para acionar a alternância --&gt;</span>
+&lt;button id="btn-toggle-ajuda" class="btn btn-outline-secondary mb-3"&gt;
+  ℹ️ Alternar Instruções
+&lt;/button&gt;
+
+<span class="cm">&lt;!-- 2. Painel de ajuda oculto por padrão (display: none) --&gt;</span>
+&lt;div id="painel-ajuda" class="alert alert-warning mb-3" style="display: none;"&gt;
+  &lt;strong&gt;Instruções:&lt;/strong&gt; Preencha o nome e e-mail antes de salvar.
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <div class="card card-highlight-blue">
+            <span class="example-tag">Exemplo 9 (📜 2. Script de Efeito jQuery)</span>
+            <h3>Comportamento em JavaScript</h3>
+            <div class="example-desc">
+              Uso de <code>.slideToggle(300)</code> para alternar o painel de instruções e <code>.slideDown(400)</code> para a mensagem surgir ao salvar:
+            </div>
+            <pre style="max-height: 280px; overflow-y: auto;"><code>$(document).ready(function() {
+  <span class="cm">// NOVO NO EXEMPLO 9: Alternar painel de ajuda deslizando</span>
+  $('#btn-toggle-ajuda').on('click', function() {
+    $('#painel-ajuda').slideToggle(300);
+  });
+
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    <span class="cm">// NOVO NO EXEMPLO 9: Deslizar alerta para baixo ao salvar</span>
+    $('#caixa-mensagem').hide().slideDown(400);
+  });
+});</code></pre>
+          </div>
+        </div>
+
+        <!-- Painel de explicação de efeitos adicionais -->
+        <div class="card mt-2">
+          <div class="explore-title">🔍 Métodos de Efeitos Visuais & Animações (Recursos Adicionais):</div>
+          <div class="table-responsive">
+            <table class="explore-table">
+              <thead>
+                <tr>
+                  <th>Método jQuery</th>
+                  <th>Descrição & Efeito Visual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>$(el).slideToggle(ms)</code></td>
+                  <td>Alterna entre expandir e recolher a cada clique com animação de deslizamento.</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).slideDown(ms)</code></td>
+                  <td>Exibe o elemento deslizando suavemente para baixo.</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).slideUp(ms)</code></td>
+                  <td>Oculta o elemento recolhendo-o suavemente para cima.</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).fadeIn(ms) / .fadeOut(ms)</code></td>
+                  <td>Exibe ou oculta o elemento ajustando a transparência/opacidade (fade).</td>
+                </tr>
+                <tr>
+                  <td><code>$(el).fadeToggle(ms)</code></td>
+                  <td>Alterna a visibilidade com transparência progressiva.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5.2: jQuery — DOM Dinâmico & Tabela (Exemplo 10) -->
+      <section class="slide" id="slide-5-2">
+        <h2 class="slide-title">⚡ jQuery: DOM Dinâmico & Tabela (Exemplo 10)</h2>
+        <p class="slide-subtitle">Inserção de Linhas na Tabela com <code>.append()</code> e Remoção com <code>.closest('tr').remove()</code>:</p>
+
+        <!-- Código HTML e JS Lado a Lado -->
+        <div class="grid-2 mb-3">
+          <div class="card card-highlight-amber">
+            <span class="example-tag">Exemplo 10 (📌 1. Estrutura HTML da Tabela)</span>
+            <h3>Tabela Dinâmica no Documento</h3>
+            <div class="example-desc">
+              Tabela Bootstrap com <code>&lt;tbody id="tabela-corpo"&gt;</code> <strong>inserida após o formulário <code>&lt;form id="form-cadastro"&gt;</code></strong>:
+            </div>
+            <pre style="max-height: 280px; overflow-y: auto;"><code><span class="cm">&lt;!-- 📍 POSICIONAMENTO: Inserida APÓS o &lt;form id="form-cadastro"&gt; --&gt;</span>
+&lt;table class="table table-striped mt-3"&gt;
+    &lt;thead class="table-dark"&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Nome&lt;/th&gt;
+            &lt;th&gt;E-mail&lt;/th&gt;
+            &lt;th&gt;Ação&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id="tabela-corpo"&gt;
+        <span class="cm">&lt;!-- Novas linhas &lt;tr&gt; inseridas dinamicamente aqui --&gt;</span>
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+          </div>
+
+          <div class="card card-highlight-blue">
+            <span class="example-tag">Exemplo 10 (📜 2. Script de Montagem & Remoção)</span>
+            <h3>Comportamento em JavaScript</h3>
+            <div class="example-desc">
+              Uso de <code>.append(trHtml)</code> ao salvar e remoção do <code>&lt;tr&gt;</code> pai com <code>.closest('tr')</code> ao clicar em Excluir:
+            </div>
+            <pre style="max-height: 280px; overflow-y: auto;"><code>$(document).ready(function() {
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val();
+    const email = $('#input-email').val();
+
+    <span class="cm">// 1. Inserir nova linha na tabela com .append()</span>
+    const trHtml = `&lt;tr&gt;&lt;td&gt;${nome}&lt;/td&gt;&lt;td&gt;${email}&lt;/td&gt;&lt;td&gt;&lt;button class="btn btn-danger btn-sm btn-excluir"&gt;Remover&lt;/button&gt;&lt;/td&gt;&lt;/tr&gt;`;
+    $('#tabela-corpo').append(trHtml);
+    $('#form-cadastro')[0].reset();
+  });
+
+  <span class="cm">// 2. Remover a linha &lt;tr&gt; pai ao clicar em Excluir</span>
+  $('#tabela-corpo').on('click', '.btn-excluir', function() {
+    $(this).closest('tr').fadeOut(300, function() { $(this).remove(); });
+  });
+});</code></pre>
+          </div>
+        </div>
+
+        <!-- Painel de explicação dividida: Métodos do DOM (Esquerda) vs Anatomia da Exclusão (Direita) -->
+        <div class="grid-2 mt-2" style="align-items: stretch;">
+          <!-- Coluna 1: Tabela de Métodos de Manipulação do DOM -->
+          <div class="card" style="padding: 0.8rem 1rem;">
+            <div class="explore-title" style="margin-bottom: 0.4rem; font-size: 0.92rem;">🔍 Métodos de Manipulação Dinâmica do DOM:</div>
+            <div class="table-responsive">
+              <table class="explore-table" style="font-size: 0.78rem;">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Função no DOM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>$(el).append(html)</code></td>
+                    <td>Insere HTML no final do elemento selecionado (ex: final do <code>&lt;tbody&gt;</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>$(el).prepend(html)</code></td>
+                    <td>Insere HTML no início do elemento selecionado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>$(this).closest('tr')</code></td>
+                    <td>Sobe no DOM até encontrar o ancestral <code>&lt;tr&gt;</code> mais próximo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>$(el).remove()</code></td>
+                    <td>Remove o elemento definitivamente da árvore DOM.</td>
+                  </tr>
+                  <tr>
+                    <td><code>$(el).empty()</code></td>
+                    <td>Limpa todo o conteúdo interno do elemento sem removê-lo.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Anatomia Detalhada do Comando de Exclusão -->
+          <div class="card card-highlight-amber" style="padding: 0.8rem 1rem;">
+            <div class="explore-title" style="margin-bottom: 0.4rem; font-size: 0.92rem;">💡 Anatomia da Exclusão <code>$(this).closest(...)</code>:</div>
+            <div style="font-size: 0.8rem; font-family: monospace; background: rgba(0, 0, 0, 0.2); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 0.5rem; white-space: nowrap; overflow-x: auto;">
+              <code>$(<span style="color:#fbbf24; font-weight:bold;">this</span>).<span style="color:#60a5fa; font-weight:bold;">closest('tr')</span>.fadeOut(300, <span style="color:#34d399; font-weight:bold;">function() { $(this).remove(); }</span>);</code>
+            </div>
+            <ul style="font-size: 0.76rem; line-height: 1.35; margin: 0; padding-left: 1.1rem;">
+              <li style="margin-bottom: 0.25rem;">
+                <strong>1. <code>$(this)</code> (1º <code>this</code>):</strong> Refere-se ao botão <code>.btn-excluir</code> específico que recebeu o clique.
+              </li>
+              <li style="margin-bottom: 0.25rem;">
+                <strong>2. <code>.closest('tr')</code>:</strong> Sobe na árvore hierárquica do DOM a partir do botão até achar o <code>&lt;tr&gt;</code> (linha) pai.
+              </li>
+              <li style="margin-bottom: 0.25rem;">
+                <strong>3. <code>.fadeOut(300, callback)</code>:</strong> Esmaece a linha por 300ms. A função interna executa <em>após</em> sumir visualmente.
+              </li>
+              <li>
+                <strong>4. <code>function() { $(this).remove(); }</code>:</strong> No callback, o 2º <code>this</code> é o <code>&lt;tr&gt;</code>, excluindo-o <strong>definitivamente</strong> do HTML/DOM.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5.2b: Deep Dive — Entendendo $(this), .closest() & Formas Alternativas -->
+      <section class="slide" id="slide-5-2b">
+        <h2 class="slide-title">🔍 Deep Dive: Entendendo <code>$(this)</code>, <code>.closest()</code> & Alternativas</h2>
+        <p class="slide-subtitle">Navegação na árvore do DOM e comparação prática entre 3 abordagens de exclusão:</p>
+
+        <!-- Grid 2 Colunas: Conceito Teórico com SVG (Esquerda) vs 3 Abordagens Práticas (Direita) -->
+        <div class="grid-2" style="grid-template-columns: 1.05fr 0.95fr; gap: 1.2rem; align-items: stretch;">
+          
+          <!-- Coluna 1: O Porquê de $(this) e .closest() + SVG da Árvore DOM -->
+          <div class="card card-highlight-blue" style="padding: 1.2rem 1.4rem;">
+            <span class="example-tag">1. NAVEGAÇÃO NA ÁRVORE DO DOM</span>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.6rem; color: white;">Por que usamos <code>$(this)</code> e <code>.closest()</code>?</h3>
+            
+            <div style="font-size: 0.92rem; line-height: 1.55; margin-bottom: 0.8rem; color: var(--text-color);">
+              <p style="margin-bottom: 0.5rem;">
+                <strong>1. O Desafio dos Múltiplos Botões:</strong> Em tabelas dinâmicas, cada linha possui um botão de exclusão idêntico sem <code>id</code> individual. O <code>$(this)</code> dentro do evento captura <strong>exatamente o botão que sofreu o clique</strong>.
+              </p>
+              <p style="margin: 0;">
+                <strong>2. Subindo a Hierarquia com <code>.closest('tr')</code>:</strong> O botão está dentro da célula <code>&lt;td&gt;</code>. Para apagar a linha inteira, o <code>.closest('tr')</code> faz o jQuery subir a árvore do DOM (de filho para pai) até encontrar o <code>&lt;tr&gt;</code> envelope.
+              </p>
+            </div>
+
+            <!-- Diagrama Ilustrativo SVG da Árvore DOM -->
+            <div style="margin-top: 0.6rem;">
+              <svg viewBox="0 0 500 200" style="width: 100%; height: auto; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px;">
+                <rect x="15" y="15" width="130" height="34" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                <text x="80" y="37" fill="#60a5fa" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">&lt;tbody&gt;</text>
+
+                <rect x="170" y="15" width="310" height="44" rx="6" fill="rgba(16, 185, 129, 0.25)" stroke="#10b981" stroke-width="2.5"/>
+                <text x="325" y="34" fill="#34d399" font-family="monospace" font-size="14" font-weight="bold" text-anchor="middle">&lt;tr&gt; (Linha Alvo)</text>
+                <text x="325" y="50" fill="#a7f3d0" font-family="sans-serif" font-size="11" text-anchor="middle">🎯 Selecionado pelo .closest('tr')</text>
+
+                <path d="M 145 32 L 170 32" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
+
+                <rect x="170" y="80" width="90" height="32" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                <text x="215" y="101" fill="#94a3b8" font-family="monospace" font-size="11" text-anchor="middle">&lt;td&gt;Nome&lt;/td&gt;</text>
+
+                <rect x="270" y="80" width="90" height="32" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                <text x="315" y="101" fill="#94a3b8" font-family="monospace" font-size="11" text-anchor="middle">&lt;td&gt;Email&lt;/td&gt;</text>
+
+                <rect x="370" y="80" width="110" height="32" rx="5" fill="rgba(239, 68, 68, 0.15)" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="425" y="101" fill="#f87171" font-family="monospace" font-size="11" text-anchor="middle">&lt;td&gt; Ações &lt;/td&gt;</text>
+
+                <rect x="375" y="130" width="100" height="32" rx="6" fill="#dc2626" stroke="#fca5a5" stroke-width="2"/>
+                <text x="425" y="151" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">Excluir 🗑️</text>
+
+                <rect x="355" y="168" width="135" height="24" rx="4" fill="#fbbf24"/>
+                <text x="422" y="184" fill="#000000" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">1. $(this) clicado</text>
+
+                <path d="M 370 145 C 310 145, 310 80, 310 63" fill="none" stroke="#fbbf24" stroke-width="3" marker-end="url(#arrowhead)"/>
+                
+                <defs>
+                  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                    <polygon points="0 0, 8 4, 0 8" fill="#fbbf24"/>
+                  </marker>
+                </defs>
+
+                <text x="180" y="145" fill="#fbbf24" font-family="sans-serif" font-size="11" font-weight="bold">2. .closest('tr') sobe ⬆️</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Coluna 2: As 3 Formas de Implementar a Exclusão -->
+          <div class="card card-highlight-amber" style="padding: 1.2rem 1.4rem;">
+            <span class="example-tag">2. COMPARAÇÃO DE IMPLEMENTAÇÕES</span>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.6rem; color: white;">3 Abordagens Práticas Equivalentes:</h3>
+
+            <!-- Opção A: Variáveis Explícitas -->
+            <div style="margin-bottom: 0.8rem;">
+              <div style="font-size: 0.88rem; font-weight: bold; color: #fbbf24; margin-bottom: 0.3rem;">
+                🟢 Opção A: Variáveis Didáticas (Passo a Passo)
+              </div>
+              <pre style="margin: 0; padding: 0.6rem 0.8rem; font-size: 0.84rem; line-height: 1.45;"><code><span class="cm">// Separa cada etapa em uma variável legível</span>
+const $btn = $(this);              <span class="cm">// 1. Botão clicado</span>
+const $linha = $btn.closest('tr'); <span class="cm">// 2. Linha &lt;tr&gt; pai</span>
+
+$linha.fadeOut(300, function() {
+  $linha.remove();                 <span class="cm">// 3. Remove do DOM</span>
+});</code></pre>
+            </div>
+
+            <!-- Opção B: Encadear em Linha Única -->
+            <div style="margin-bottom: 0.8rem;">
+              <div style="font-size: 0.88rem; font-weight: bold; color: #60a5fa; margin-bottom: 0.3rem;">
+                ⚡ Opção B: Encadeada (Usada no Exemplo 10)
+              </div>
+              <pre style="margin: 0; padding: 0.6rem 0.8rem; font-size: 0.84rem; line-height: 1.45;"><code><span class="cm">// Tudo encadeado em uma única instrução fluente</span>
+$(this).closest('tr').fadeOut(300, function() {
+  $(this).remove(); <span class="cm">// Este 2º $(this) refere-se ao &lt;tr&gt;</span>
+});</code></pre>
+            </div>
+
+            <!-- Opção C: Atributo data-id -->
+            <div>
+              <div style="font-size: 0.88rem; font-weight: bold; color: #c084fc; margin-bottom: 0.3rem;">
+                💾 Opção C: Atributo <code>data-index</code> (Exemplo 11)
+              </div>
+              <pre style="margin: 0; padding: 0.6rem 0.8rem; font-size: 0.84rem; line-height: 1.45;"><code><span class="cm">// HTML: &lt;button data-index="2" class="btn-excluir"&gt;</span>
+const idx = $(this).data('index');
+clientes.splice(idx, 1); <span class="cm">// Remove do Array de dados</span>
+renderTabela();           <span class="cm">// Redesenha a interface</span></code></pre>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 5.3: jQuery — Persistência no LocalStorage (Exemplo 11) -->
+      <section class="slide" id="slide-5-3">
+        <h2 class="slide-title">⚡ jQuery: Persistência no LocalStorage (Exemplo 11)</h2>
+        <p class="slide-subtitle">Salvando e Recuperando a Lista de Clientes com Web Storage & JSON:</p>
+
+        <!-- Container Grid 2 Colunas: Formulário (Esquerda) vs Tabela & LocalStorage (Direita) -->
+        <div class="grid-2" style="grid-template-columns: 0.95fr 1.05fr; gap: 1.2rem; align-items: stretch;">
+          
+          <!-- Painel Esquerdo: Formulário de Entrada -->
+          <div class="card card-highlight-blue" style="padding: 1rem 1.2rem;">
+            <span class="example-tag">1. FORMULÁRIO DE CADASTRO DE CLIENTES</span>
+            
+            <form id="form-ex11" style="margin-top: 0.5rem;">
+              <div class="mb-2">
+                <label for="input-nome" class="form-label" style="color: white; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.2rem;">Nome Completo:</label>
+                <input type="text" class="form-control form-control-sm" id="input-nome" placeholder="Ex: Maria Silva" required style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.2); color: white; font-size: 0.82rem;">
+              </div>
+
+              <div class="mb-3">
+                <label for="input-email" class="form-label" style="color: white; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.2rem;">Endereço de E-mail:</label>
+                <input type="email" class="form-control form-control-sm" id="input-email" placeholder="Ex: maria@email.com" required style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.2); color: white; font-size: 0.82rem;">
+              </div>
+
+              <button type="submit" class="btn btn-success btn-sm w-100 fw-bold" style="padding: 0.4rem; font-size: 0.85rem;">
+                <i class="bi bi-person-plus-fill me-1"></i> Cadastrar & Salvar no LocalStorage
+              </button>
+            </form>
+
+            <div class="mt-3" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 6px; padding: 0.5rem 0.7rem; font-size: 0.76rem; color: #7dd3fc; line-height: 1.4;">
+              <strong>💡 Experimente no Laboratório:</strong><br>
+              Cadastre um cliente, recarregue a página (<code>F5</code>) e comprove que os dados continuam salvos no seu navegador!
+            </div>
+          </div>
+
+          <!-- Painel Direito: Tabela com Dados Persistidos -->
+          <div class="card card-highlight-emerald" style="padding: 1rem 1.2rem; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span class="example-tag" style="margin-bottom: 0;">2. REGISTROS PERSISTIDOS NO LOCALSTORAGE</span>
+              <button class="btn btn-outline-danger btn-sm" onclick="limparStorageEx11()" style="font-size: 0.7rem; padding: 0.15rem 0.4rem;">
+                <i class="bi bi-trash-fill me-1"></i> Limpar Storage
+              </button>
+            </div>
+
+            <div class="table-responsive" style="flex: 1; max-height: 220px; overflow-y: auto;">
+              <table class="table table-dark table-hover table-striped table-bordered align-middle mb-0" style="font-size: 0.78rem;">
+                <thead class="table-group-divider" style="border-color: rgba(255,255,255,0.2);">
+                  <tr>
+                    <th style="color: var(--accent-blue);">Nome</th>
+                    <th style="color: var(--accent-blue);">E-mail</th>
+                    <th style="width: 80px; text-align: center; color: var(--accent-amber);">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-corpo-ex11">
+                  <!-- Linhas renderizadas dinamicamente via JS / LocalStorage -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5.3b: Deep Dive — Estratégia de Renderização & Persistência (Exemplo 11) -->
+      <section class="slide" id="slide-5-3b">
+        <h2 class="slide-title">🔍 Deep Dive: Estratégia de Renderização & Persistência</h2>
+        <p class="slide-subtitle">Entendendo a função <code>renderTabela()</code> e o fluxo de dados em aplicações reativas:</p>
+
+        <!-- Grid 2 Colunas: Mudança de Paradigma (Esquerda) vs Diagrama de Fluxo & Código (Direita) -->
+        <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: stretch;">
+          
+          <!-- Coluna 1: Comparativo de Paradigmas (Exemplo 10 vs Exemplo 11) -->
+          <div class="card card-highlight-purple" style="padding: 1.2rem 1.4rem;">
+            <span class="example-tag">1. MUDANÇA DE PARADIGMA (DOM vs DADOS)</span>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.6rem; color: white;">Como a aplicação gerencia a tela?</h3>
+            
+            <!-- Exemplo 10 -->
+            <div style="background: rgba(239, 68, 68, 0.12); border-left: 4px solid #ef4444; padding: 0.6rem 0.8rem; border-radius: 6px; margin-bottom: 0.7rem; font-size: 0.9rem; line-height: 1.5;">
+              <strong style="color: #f87171;">❌ Exemplo 10 (Manipulação Direta do DOM):</strong><br>
+              A cada clique, alterava a tabela HTML isoladamente com <code>.append()</code> e <code>.remove()</code>.<br>
+              <em>Problema:</em> O HTML era a única fonte da verdade; ao dar F5, tudo sumia!
+            </div>
+
+            <!-- Exemplo 11 -->
+            <div style="background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; padding: 0.6rem 0.8rem; border-radius: 6px; margin-bottom: 0.7rem; font-size: 0.9rem; line-height: 1.5;">
+              <strong style="color: #34d399;">✅ Exemplo 11 (Arquitetura Reativa a Dados):</strong><br>
+              A fonte da verdade é o <strong>array <code>clientes</code></strong> gravado no <code>localStorage</code>.<br>
+              O código atualiza os dados e chama a função <code>renderTabela()</code>.
+            </div>
+
+            <!-- Vantagens da Função renderTabela() -->
+            <div style="font-size: 0.9rem; line-height: 1.5; color: var(--text-color);">
+              <div style="font-weight: bold; color: #c084fc; margin-bottom: 0.3rem;">💡 Vantagens do Método <code>renderTabela()</code>:</div>
+              <ul style="margin: 0; padding-left: 1.2rem;">
+                <li style="margin-bottom: 0.3rem;"><strong>Evita duplicação:</strong> O mesmo código redesenha a tela no F5, no envio do form e na remoção.</li>
+                <li style="margin-bottom: 0.3rem;"><strong>100% de Fidelidade:</strong> A interface reflete exatamente o estado do <code>localStorage</code>.</li>
+                <li><strong>Padrão Moderno:</strong> É a mesma arquitetura utilizada em React, Vue e Angular!</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Fluxograma SVG & Código renderTabela() -->
+          <div class="card card-highlight-emerald" style="padding: 1.2rem 1.4rem;">
+            <span class="example-tag">2. FLUXOGRAMA DE DADOS & CÓDIGO</span>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.6rem; color: white;">Como os Dados Fluem no Sistema:</h3>
+
+            <!-- Diagrama Ilustrativo SVG -->
+            <div style="margin-bottom: 0.8rem;">
+              <svg viewBox="0 0 520 170" style="width: 100%; height: auto; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 6px;">
+                <rect x="15" y="15" width="110" height="48" rx="8" fill="rgba(59, 130, 246, 0.25)" stroke="#3b82f6" stroke-width="2"/>
+                <text x="70" y="37" fill="#60a5fa" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Formulário</text>
+                <text x="70" y="53" fill="#93c5fd" font-family="sans-serif" font-size="10" text-anchor="middle">Evento submit</text>
+
+                <path d="M 125 39 L 155 39" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#blue-arrow)"/>
+
+                <rect x="160" y="15" width="115" height="48" rx="8" fill="rgba(168, 85, 247, 0.25)" stroke="#a855f7" stroke-width="2"/>
+                <text x="217" y="37" fill="#c084fc" font-family="monospace" font-size="12" font-weight="bold" text-anchor="middle">clientes [ ]</text>
+                <text x="217" y="53" fill="#e9d5ff" font-family="sans-serif" font-size="10" text-anchor="middle">Array de Objetos</text>
+
+                <path d="M 275 39 L 305 39" stroke="#a855f7" stroke-width="2.5" marker-end="url(#purple-arrow)"/>
+
+                <rect x="310" y="15" width="115" height="48" rx="8" fill="rgba(245, 158, 11, 0.25)" stroke="#f59e0b" stroke-width="2"/>
+                <text x="367" y="37" fill="#fbbf24" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">💾 LocalStorage</text>
+                <text x="367" y="53" fill="#fde68a" font-family="sans-serif" font-size="10" text-anchor="middle">JSON.stringify()</text>
+
+                <path d="M 367 63 L 367 98" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#amber-arrow)"/>
+
+                <rect x="210" y="102" width="295" height="48" rx="8" fill="rgba(16, 185, 129, 0.3)" stroke="#10b981" stroke-width="2.5"/>
+                <text x="357" y="124" fill="#34d399" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">renderTabela()</text>
+                <text x="357" y="140" fill="#a7f3d0" font-family="sans-serif" font-size="11" text-anchor="middle">Redesenha a Tabela HTML com Fidelidade</text>
+
+                <path d="M 310 39 C 180 -10, 180 126, 205 126" fill="none" stroke="#34d399" stroke-width="2" stroke-dasharray="4" marker-end="url(#emerald-arrow)"/>
+                <text x="110" y="98" fill="#34d399" font-family="sans-serif" font-size="10" font-weight="bold">F5: Auto-Leitura</text>
+
+                <defs>
+                  <marker id="blue-arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#38bdf8"/></marker>
+                  <marker id="purple-arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#a855f7"/></marker>
+                  <marker id="amber-arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#f59e0b"/></marker>
+                  <marker id="emerald-arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#34d399"/></marker>
+                </defs>
+              </svg>
+            </div>
+
+            <!-- Algoritmo da Função renderTabela() -->
+            <div style="font-size: 0.88rem; font-weight: bold; color: #34d399; margin-bottom: 0.3rem;">
+              📜 Código da Função <code>renderTabela()</code>:
+            </div>
+            <pre style="margin: 0; padding: 0.6rem 0.8rem; font-size: 0.84rem; line-height: 1.45;"><code>function renderTabela() {
+  $('#tabela-corpo').empty(); <span class="cm">// 1. Limpa linhas antigas</span>
+  
+  clientes.forEach((c, index) => { <span class="cm">// 2. Percorre lista</span>
+    $('#tabela-corpo').append(`
+      &lt;tr&gt;
+        &lt;td&gt;${c.nome}&lt;/td&gt;&lt;td&gt;${c.email}&lt;/td&gt;
+        &lt;td&gt;&lt;button class="btn-excluir" data-index="${index}"&gt;Remover&lt;/button&gt;&lt;/td&gt;
+      &lt;/tr&gt;`); <span class="cm">// 3. Renderiza com index</span>
+  });
+}</code></pre>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 5.3c: Deep Dive — Web Storage API (LocalStorage: Características, Casos de Uso & Limitações) -->
+      <section class="slide" id="slide-5-3c">
+        <h2 class="slide-title">💾 Deep Dive: Entendendo a Web Storage API (LocalStorage)</h2>
+        <p class="slide-subtitle">Características, diagrama de arquitetura, aplicações reais e diretrizes de segurança:</p>
+
+        <!-- Grid 3 Colunas: Características (Esq), Ilustração SVG (Meio), Limitações & Segurança (Dir) -->
+        <div class="grid-3" style="gap: 1.1rem; align-items: stretch;">
+          
+          <!-- Coluna 1: Características Principais -->
+          <div class="card card-highlight-purple" style="padding: 1.2rem 1.2rem;">
+            <span class="example-tag">1. CARACTERÍSTICAS TÉCNICAS</span>
+            <h3 style="font-size: 1.08rem; margin-bottom: 0.6rem; color: white;">Como Funciona o Storage</h3>
+            
+            <ul style="font-size: 0.88rem; line-height: 1.55; margin: 0; padding-left: 1.2rem; color: var(--text-color);">
+              <li style="margin-bottom: 0.5rem;">
+                <strong>📌 Persistência Sem Prazo:</strong> Dados continuam salvos ao fechar a aba, reiniciar o navegador ou desligar o PC (diferente do <code>sessionStorage</code>).
+              </li>
+              <li style="margin-bottom: 0.5rem;">
+                <strong>💻 Client-Side Puro:</strong> 100% no navegador do usuário. Não consome tráfego de rede nem servidor backend.
+              </li>
+              <li style="margin-bottom: 0.5rem;">
+                <strong>🔤 Apenas Strings:</strong> Armazena chave-valor em texto. Exige <code>JSON.stringify()</code> ao salvar e <code>JSON.parse()</code> ao ler objetos.
+              </li>
+              <li>
+                <strong>🛡️ Mesma Origem:</strong> Dados isolados por domínio/porta (<code>meusite.com</code> não lê <code>outrosite.com</code>).
+              </li>
+            </ul>
+          </div>
+
+          <!-- Coluna 2: Diagrama Ilustrativo SVG & Casos de Uso -->
+          <div class="card card-highlight-emerald" style="padding: 1.2rem 1.2rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="example-tag">2. ARQUITETURA & APLICAÇÕES</span>
+              <h3 style="font-size: 1.08rem; margin-bottom: 0.6rem; color: white;">Diagrama & Casos de Uso Reais</h3>
+            </div>
+
+            <!-- Diagrama Ilustrativo SVG -->
+            <div style="margin: 0.3rem 0;">
+              <svg viewBox="0 0 460 180" style="width: 100%; height: auto; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 6px;">
+                <rect x="15" y="12" width="430" height="156" rx="10" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+                <rect x="15" y="12" width="430" height="26" rx="10" fill="#1e293b"/>
+                <circle cx="32" cy="25" r="4.5" fill="#ef4444"/>
+                <circle cx="46" cy="25" r="4.5" fill="#f59e0b"/>
+                <circle cx="60" cy="25" r="4.5" fill="#10b981"/>
+                <text x="230" y="29" fill="#94a3b8" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">window.localStorage (Web Storage API)</text>
+
+                <rect x="28" y="48" width="185" height="108" rx="8" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="1.5"/>
+                <text x="120" y="66" fill="#60a5fa" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">🌐 Domínio Isolado</text>
+                <text x="120" y="82" fill="#93c5fd" font-family="monospace" font-size="9.5" text-anchor="middle">https://meusite.com</text>
+
+                <rect x="38" y="94" width="165" height="50" rx="6" fill="#1e293b" stroke="#475569"/>
+                <text x="120" y="112" fill="#cbd5e1" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">Armazenamento Chave-Valor</text>
+                <text x="120" y="130" fill="#34d399" font-family="monospace" font-size="9" text-anchor="middle">'lista' ➔ "[{...}]"</text>
+
+                <rect x="228" y="48" width="205" height="108" rx="8" fill="rgba(168, 85, 247, 0.15)" stroke="#a855f7" stroke-width="1.5"/>
+                <text x="330" y="66" fill="#c084fc" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">⚡ Onde Usar no Mercado?</text>
+
+                <rect x="238" y="76" width="88" height="24" rx="4" fill="rgba(16, 185, 129, 0.25)" stroke="#10b981"/>
+                <text x="282" y="92" fill="#34d399" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">🌙 Dark Mode</text>
+
+                <rect x="334" y="76" width="90" height="24" rx="4" fill="rgba(59, 130, 246, 0.25)" stroke="#3b82f6"/>
+                <text x="379" y="92" fill="#60a5fa" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">🛒 Carrinho</text>
+
+                <rect x="238" y="108" width="88" height="24" rx="4" fill="rgba(245, 158, 11, 0.25)" stroke="#f59e0b"/>
+                <text x="282" y="124" fill="#fbbf24" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">📝 Rascunhos</text>
+
+                <rect x="334" y="108" width="90" height="24" rx="4" fill="rgba(168, 85, 247, 0.25)" stroke="#a855f7"/>
+                <text x="379" y="124" fill="#c084fc" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">🔑 Tokens JWT</text>
+              </svg>
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center; font-style: italic;">
+              Disponível em todos os navegadores modernos sem instalação!
+            </div>
+          </div>
+
+          <!-- Coluna 3: Limitações e Cuidados de Segurança -->
+          <div class="card card-highlight-amber" style="padding: 1.2rem 1.2rem;">
+            <span class="example-tag">3. LIMITAÇÕES E SEGURANÇA</span>
+            <h3 style="font-size: 1.08rem; margin-bottom: 0.6rem; color: white;">Cuidados que Devemos Ter</h3>
+
+            <div style="font-size: 0.88rem; line-height: 1.5; color: var(--text-color);">
+              <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 0.55rem 0.75rem; border-radius: 6px; margin-bottom: 0.6rem;">
+                <strong style="color: #fbbf24;">⚠️ Capacidade Limitada (~5MB):</strong><br>
+                Projetado para textos e pequenos JSONs. Nunca salve imagens pesadas em base64 ou arquivos.
+              </div>
+
+              <div style="background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444; padding: 0.55rem 0.75rem; border-radius: 6px; margin-bottom: 0.6rem;">
+                <strong style="color: #f87171;">🔒 Inseguro para Dados Sensíveis:</strong><br>
+                <strong>Nunca</strong> guarde senhas em texto puro, cartões de crédito ou dados bancários. Scripts maliciosos (XSS) podem ler com <code>localStorage.getItem()</code>.
+              </div>
+
+              <div style="background: rgba(96, 165, 250, 0.15); border-left: 4px solid #3b82f6; padding: 0.55rem 0.75rem; border-radius: 6px;">
+                <strong style="color: #60a5fa;">💻 Isolamento Local:</strong><br>
+                Dados gravados no Chrome do celular <em>não</em> aparecem no PC sem um banco de dados backend remoto.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 6: Guia Interativo de Código jQuery -->
+      <section class="slide" id="slide-6">
+        <h2 class="slide-title">💻 Guia Interativo de Código (jQuery)</h2>
+        <p class="slide-subtitle">Use as abas abaixo para consultar os exemplos da aula:</p>
+
+        <div class="code-tabs">
+          <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('tab-cdn-jq')">CDN jQuery</button>
+            <button class="tab-btn" onclick="switchTab('tab-ex6')">Ex 6 (.val / .html)</button>
+            <button class="tab-btn" onclick="switchTab('tab-ex7')">Ex 7 (Classes/Fade)</button>
+            <button class="tab-btn" onclick="switchTab('tab-ex8')">Ex 8 (Cores .css)</button>
+            <button class="tab-btn" onclick="switchTab('tab-ex9')">Ex 9 (.slideToggle)</button>
+            <button class="tab-btn" onclick="switchTab('tab-ex10')">Ex 10 (DOM Tabela)</button>
+            <button class="tab-btn" onclick="switchTab('tab-ex11')">Ex 11 (LocalStorage)</button>
+          </div>
+
+          <div id="tab-cdn-jq" class="tab-content active">
+            <div class="example-desc" style="margin-bottom: 0.8rem;">
+              <strong>O que está sendo desenvolvido:</strong> Inclusão da biblioteca jQuery 3.7.1 via CDN oficial antes de fechar a tag &lt;/body&gt;.
+            </div>
+            <div class="code-preview-split">
+              <div class="code-column">
+                <pre><code class="language-html">&lt;!-- jQuery CDN (Posicionar antes do &lt;/body&gt;) --&gt;
+&lt;script src="https://code.jquery.com/jquery-3.7.1.min.js"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+  $(document).ready(function() {
+    console.log("jQuery carregado!");
+    $("#meuBotao").click(function() {
+      alert("Botão clicado via jQuery!");
+    });
+  });
+&lt;/script&gt;</code></pre>
+              </div>
+              <div class="preview-column">
+                <div class="preview-header">
+                  <span class="preview-title">Resultado no Navegador:</span>
+                  <span class="preview-badge">JavaScript / DOM</span>
+                </div>
+                <div class="preview-body bg-light p-3 rounded">
+                  <div class="container text-center py-3">
+                    <button class="btn btn-success font-code" onclick="alert('Botão clicado via jQuery!')">
+                      <i class="bi bi-play-circle-fill me-1"></i> Testar Execução jQuery
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-ex6" class="tab-content">
+            <div class="example-desc" style="margin-bottom: 0.8rem;">
+              <strong>Estrutura Base (Exemplo 6):</strong> Leitura & Escrita de Campos com <code>.val()</code> e <code>.html()</code> no formulário unificado.
+            </div>
+            <pre style="max-height: 380px; overflow-y: auto;"><code>$(document).ready(function() {
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val();
+    const email = $('#input-email').val();
+    $('#caixa-mensagem').html(`Lido: <strong>${nome}</strong> (${email})`);
+  });
+});</code></pre>
+          </div>
+
+          <div id="tab-ex7" class="tab-content">
+            <div class="example-desc" style="margin-bottom: 0.8rem;">
+              <strong>Adicionado em relação ao Exemplo 6:</strong> Classes CSS do Bootstrap e <strong>efeito visual de piscar/pulsar duplo</strong> encadeando <code>.fadeOut(150).fadeIn(150)</code> para deixar a animação visível.
+            </div>
+            <pre style="max-height: 380px; overflow-y: auto;"><code>$(document).ready(function() {
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val();
+    const email = $('#input-email').val();
+
+    <span class="cm">// NOVO NO EXEMPLO 7: Troca de classe alert-success + piscar 2x</span>
+    $('#caixa-mensagem')
+      .removeClass('d-none alert-info alert-danger')
+      .addClass('alert-success')
+      .html(`🎉 <strong>Sucesso!</strong> Cliente <u>${nome}</u> cadastrado!`)
+      .fadeOut(150).fadeIn(150)
+      .fadeOut(150).fadeIn(400);
+  });
+});</code></pre>
+          </div>
+
+          <div id="tab-ex8" class="tab-content">
+            <div class="example-desc" style="margin-bottom: 0.8rem;">
+              <strong>Adicionado em relação ao Exemplo 7:</strong> Troca dinâmica de cores de fundo, texto e bordas diretamente via código usando <code>$(el).css()</code>.
+            </div>
+            <pre style="max-height: 380px; overflow-y: auto;"><code>$(document).ready(function() {
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val();
+    const email = $('#input-email').val();
+
+    <span class="cm">// NOVO NO EXEMPLO 8: Alterando a cor do formulário e da mensagem com .css()</span>
+    $('#form-cadastro').css('background-color', '#eaf5eb');
+    $('#caixa-mensagem')
+      .removeClass('d-none')
+      .css({ 'background-color': '#d1e7dd', 'color': '#0f5132', 'border-color': '#badbcc' })
+      .html(`🎨 <strong>Estilo Aplicado!</strong> Cliente <u>${nome}</u> (${email}) cadastrado.`);
+  });
+});</code></pre>
+          </div>
+
+          <div id="tab-ex9" class="tab-content">
+            <div class="example-desc" style="margin-bottom: 0.8rem;">
+              <strong>Adicionado em relação ao Exemplo 8:</strong> Painel retrátil de instruções com <code>.slideToggle(300)</code> e revelação de alerta deslizando com <code>.slideDown(400)</code>.
+            </div>
+            <pre style="max-height: 380px; overflow-y: auto;"><code>$(document).ready(function() {
+  <span class="cm">// NOVO NO EXEMPLO 9: Botão que alterna o painel de ajuda deslizando</span>
+  $('#btn-toggle-ajuda').on('click', function() {
+    $('#painel-ajuda').slideToggle(300);
+  });
+
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val();
+    const email = $('#input-email').val();
+
+    <span class="cm">// NOVO NO EXEMPLO 9: Deslizar caixa de mensagem para baixo</span>
+    $('#caixa-mensagem')
+      .html(`✨ <strong>Cliente Salvo!</strong> <u>${nome}</u> (${email}).`)
+      .hide()
+      .slideDown(400);
+  });
+});</code></pre>
+          </div>
+
+          <div id="tab-ex10" class="tab-content">
+            <div class="example-desc" style="margin-bottom: 0.8rem;">
+              <strong>Adicionado em relação ao Exemplo 9:</strong> Tabela dinâmica onde novas linhas são inseridas com <code>.append()</code> e removidas com <code>$(this).closest('tr').fadeOut().remove()</code>.
+            </div>
+            <pre style="max-height: 380px; overflow-y: auto;"><code>$(document).ready(function() {
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val();
+    const email = $('#input-email').val();
+
+    <span class="cm">// NOVO NO EXEMPLO 10: Inserir nova linha &lt;tr&gt; na tabela</span>
+    const trHtml = `
+      &lt;tr&gt;
+        &lt;td&gt;${nome}&lt;/td&gt;
+        &lt;td&gt;${email}&lt;/td&gt;
+        &lt;td&gt;&lt;button class="btn btn-danger btn-sm btn-excluir"&gt;Remover&lt;/button&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    `;
+    $('#tabela-corpo').append(trHtml);
+    $('#form-cadastro')[0].reset();
+  });
+
+  <span class="cm">// NOVO NO EXEMPLO 10: Remover linha &lt;tr&gt; pai ao clicar no botão Excluir</span>
+  $('#tabela-corpo').on('click', '.btn-excluir', function() {
+    $(this).closest('tr').fadeOut(300, function() {
+      $(this).remove();
+    });
+  });
+});</code></pre>
+          </div>
+
+          <div id="tab-ex11" class="tab-content">
+            <div class="example-desc" style="margin-bottom: 0.8rem;">
+              <strong>Adicionado em relação ao Exemplo 10:</strong> Camada de armazenamento permanente no navegador via <code>localStorage</code> com <code>JSON.stringify()</code>, <code>JSON.parse()</code> e limpa automática de formulário.
+            </div>
+            
+            <div class="code-preview-split">
+              <!-- Coluna do Código -->
+              <div class="code-column">
+                <pre style="max-height: 400px; overflow-y: auto;"><code>$(document).ready(function() {
+  <span class="cm">// 1. Leitura segura do LocalStorage (trata nulo ou erro)</span>
+  let clientes = [];
+  try {
+    clientes = JSON.parse(localStorage.getItem('lista_clientes')) || [];
+  } catch(e) { clientes = []; }
+
+  <span class="cm">// 2. Função para desenhar a tabela</span>
+  function renderTabela() {
+    $('#tabela-corpo').empty();
+    clientes.forEach((c, index) => {
+      const tr = `&lt;tr&gt;
+        &lt;td&gt;${c.nome}&lt;/td&gt;
+        &lt;td&gt;${c.email}&lt;/td&gt;
+        &lt;td&gt;&lt;button class="btn btn-danger btn-sm btn-excluir" data-index="${index}"&gt;Remover&lt;/button&gt;&lt;/td&gt;
+      &lt;/tr&gt;`;
+      $('#tabela-corpo').append(tr);
+    });
+  }
+
+  renderTabela(); <span class="cm">// Auto-carrega no F5</span>
+
+  <span class="cm">// 3. Submissão e gravação no LocalStorage</span>
+  $('#form-cadastro').on('submit', function(e) {
+    e.preventDefault();
+    const nome = $('#input-nome').val().trim();
+    const email = $('#input-email').val().trim();
+
+    if (!nome || !email) return;
+
+    clientes.push({ nome, email });
+    localStorage.setItem('lista_clientes', JSON.stringify(clientes));
+    renderTabela();
+    $('#form-cadastro')[0].reset(); <span class="cm">// Limpa formulário</span>
+  });
+
+  <span class="cm">// 4. Remoção no clique e atualização do Storage</span>
+  $('#tabela-corpo').on('click', '.btn-excluir', function() {
+    const index = parseInt($(this).attr('data-index'), 10);
+    clientes.splice(index, 1);
+    localStorage.setItem('lista_clientes', JSON.stringify(clientes));
+    renderTabela();
+  });
+});</code></pre>
+              </div>
+
+              <!-- Coluna de Demonstração Interativa ao Vivo no Slide -->
+              <div class="preview-column">
+                <div class="preview-header">
+                  <span class="preview-title">Resultado Interativo ao Vivo (Exemplo 11):</span>
+                  <span class="preview-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);">LocalStorage Ativo</span>
+                </div>
+                <div class="preview-body bg-dark text-light p-3 rounded border border-secondary" style="max-height: 400px; overflow-y: auto;">
+                  
+                  <form id="demo-slide-form" class="mb-3">
+                    <div class="row g-2 mb-2">
+                      <div class="col-6">
+                        <input type="text" id="demo-slide-nome" class="form-control form-control-sm bg-dark text-light border-secondary" placeholder="Nome do cliente" required>
+                      </div>
+                      <div class="col-6">
+                        <input type="email" id="demo-slide-email" class="form-control form-control-sm bg-dark text-light border-secondary" placeholder="E-mail" required>
+                      </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-success btn-sm flex-grow-1 font-code fw-bold">
+                        <i class="bi bi-plus-circle-fill me-1"></i> Cadastrar no Storage
+                      </button>
+                      <button type="button" id="demo-slide-limpar" class="btn btn-outline-danger btn-sm font-code">
+                        <i class="bi bi-trash-fill"></i> Limpar
+                      </button>
+                    </div>
+                  </form>
+
+                  <div id="demo-slide-msg" class="alert alert-success py-1 px-2 small d-none mb-2"></div>
+
+                  <table class="table table-dark table-striped table-sm mb-0 small border border-secondary align-middle">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th class="text-center">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody id="demo-slide-tabela">
+                      <!-- Linhas carregadas ao vivo via script -->
+                    </tbody>
+                  </table>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+      <!-- SLIDE 7: Checklist Mão na Massa Parte 2 -->
+      <section class="slide" id="slide-7">
+        <h2 class="slide-title">📝 Checklist Mão na Massa (Parte 2: jQuery)</h2>
+        <p class="slide-subtitle">Tornando a aplicação 100% dinâmica no laboratório:</p>
+
+        <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; max-width: 900px; margin: 0 auto;">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+              <div style="background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+              <div>
+                <strong style="color: white; font-size: 1.05rem;">Incluir o jQuery & $(document).ready()</strong>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;">Adicionar a tag <code>&lt;script src="https://code.jquery.com/jquery-3.7.1.min.js"&gt;&lt;/script&gt;</code> antes de fechar o <code>&lt;/body&gt;</code> e inicializar a função principal.</p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+              <div style="background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+              <div>
+                <strong style="color: white; font-size: 1.05rem;">Capturar Submissão & Adicionar Linhas Dinâmicas</strong>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;">Escutar o evento <code>$("#formCadastro").submit()</code>, ler os campos com <code>$("#nome").val()</code>, prevenir o recarregamento com <code>e.preventDefault()</code> e dar <code>.append()</code> na tabela.</p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+              <div style="background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+              <div>
+                <strong style="color: white; font-size: 1.05rem;">Implementar Salvamento no LocalStorage (Exemplo 11)</strong>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;">Salvar o array de objetos no navegador com <code>localStorage.setItem("registros", JSON.stringify(lista))</code> e recarregar automaticamente ao abrir a página.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- SLIDE 8: Encerramento Parte 2 -->
+      <section class="slide" id="slide-8">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+          <div style="margin-bottom: 1rem;">
+            <span style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-emerald); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600;">
+              <i class="bi bi-trophy-fill me-1"></i> Módulo de Retomada Frontend Concluído!
+            </span>
+          </div>
+
+          <h2 class="slide-title" style="font-size: 2.4rem; line-height: 1.2; margin-bottom: 0.8rem;">
+            Parabéns! Sua Aplicação Web Está Dinâmica e Funcional!
+          </h2>
+
+          <p class="slide-subtitle" style="font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 auto 2rem auto;">
+            Você dominou o design responsivo com Bootstrap 5 e a programação no cliente com jQuery & LocalStorage.
+          </p>
+
+          <div style="background: rgba(19, 27, 46, 0.8); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; max-width: 650px; width: 100%; margin-bottom: 1.5rem;">
+            <h3 style="color: white; font-size: 1.2rem; margin-bottom: 0.8rem;">🚀 Próximas Aulas de ProgWeb 2:</h3>
+            <ul style="text-align: left; color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem; padding-left: 1.2rem;">
+              <li>Arquitetura de APIs RESTful e requisições assíncronas (AJAX / Fetch)</li>
+              <li>Consumo de dados em formato JSON em tempo real</li>
+              <li>Estruturação do Backend e conexão com banco de dados</li>
+            </ul>
+
+            <a href="../parte-1-bootstrap/index.html" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.75rem 1.8rem; font-size: 1.05rem; background: var(--accent-blue); color: white; border-radius: 8px; font-weight: 700;">
+              <i class="bi bi-arrow-left-circle-fill"></i> Voltar para a Parte 1 (Bootstrap 5)
+            </a>
+          </div>
+        </div>
+      </section>
+      </main>
+
+    <!-- Rodapé -->
+    <footer class="app-footer">
+      <div class="progress-container">
+        <div class="progress-bar-bg">
+          <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+        <span id="slide-counter" class="slide-counter">Slide 1 de 17</span>
+      </div>
+
+      <div class="nav-controls">
+        <button id="btn-prev" class="nav-btn" onclick="prevSlide()" disabled>
+          ◀ Anterior
+        </button>
+        <button id="btn-next" class="nav-btn" onclick="nextSlide()">
+          Próximo ▶
+        </button>
+        <button class="nav-btn btn-fs" onclick="toggleFullscreen()" title="Alternar Tela Cheia">
+          ⛶
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const slides = document.querySelectorAll(".slide-stage > section.slide");
+    const totalSlides = slides.length;
+
+    function updateSlides() {
+      document.querySelectorAll('.slide').forEach((slide, idx) => {
+        if (idx + 1 === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      document.getElementById('btn-prev').disabled = (currentSlide === 1);
+      document.getElementById('btn-next').disabled = (currentSlide === totalSlides);
+
+      document.getElementById('slide-counter').textContent = `Slide ${currentSlide} de ${totalSlides}`;
+      const percentage = (currentSlide / totalSlides) * 100;
+      document.getElementById('progress-fill').style.width = `${percentage}%`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlides();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlides();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function toggleCheck(el) {
+      el.classList.toggle('checked');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+
+  <!-- Script de Interatividade do Exemplo 11 (LocalStorage) ao vivo no slide -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      let slideClientes = [];
+      try {
+        slideClientes = JSON.parse(localStorage.getItem('demo_slide_clientes')) || [];
+      } catch(e) { slideClientes = []; }
+
+      function renderDemoSlideTabela() {
+        const $tb = $('#demo-slide-tabela');
+        if (!$tb.length) return;
+        $tb.empty();
+        if (slideClientes.length === 0) {
+          $tb.append('<tr><td colspan="3" class="text-center text-secondary py-2">Nenhum cliente no Storage.</td></tr>');
+          return;
+        }
+        slideClientes.forEach((c, idx) => {
+          $tb.append(`<tr>
+            <td>${c.nome}</td>
+            <td>${c.email}</td>
+            <td class="text-center"><button type="button" class="btn btn-danger btn-sm py-0 px-2 btn-demo-excluir" data-index="${idx}">Remover</button></td>
+          </tr>`);
+        });
+      }
+
+      renderDemoSlideTabela();
+
+      $('#demo-slide-form').on('submit', function(e) {
+        e.preventDefault();
+        const nome = $('#demo-slide-nome').val().trim();
+        const email = $('#demo-slide-email').val().trim();
+        if (!nome || !email) return;
+
+        slideClientes.push({ nome, email });
+        localStorage.setItem('demo_slide_clientes', JSON.stringify(slideClientes));
+        renderDemoSlideTabela();
+        $('#demo-slide-form')[0].reset();
+        $('#demo-slide-msg').removeClass('d-none').html(`🎉 <strong>${nome}</strong> salvo no LocalStorage!`).hide().fadeIn(300);
+        setTimeout(() => $('#demo-slide-msg').fadeOut(300), 3000);
+      });
+
+      $('#demo-slide-tabela').on('click', '.btn-demo-excluir', function() {
+        const idx = parseInt($(this).attr('data-index'), 10);
+        if (!isNaN(idx)) {
+          slideClientes.splice(idx, 1);
+          localStorage.setItem('demo_slide_clientes', JSON.stringify(slideClientes));
+          renderDemoSlideTabela();
+        }
+      });
+
+      $('#demo-slide-limpar').on('click', function() {
+        slideClientes = [];
+        localStorage.removeItem('demo_slide_clientes');
+        renderDemoSlideTabela();
+        $('#demo-slide-msg').removeClass('d-none').html('🧹 LocalStorage limpo!').hide().fadeIn(300);
+        setTimeout(() => $('#demo-slide-msg').fadeOut(300), 3000);
+      });
+    });
+  </script>
+
+</body>
+</html>
